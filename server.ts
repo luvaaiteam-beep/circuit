@@ -26,6 +26,10 @@ async function startServer() {
   app.use(cors());
   app.use(express.json());
 
+  app.get('/api/ping', (req, res) => {
+    res.status(200).send('pong');
+  });
+
   app.post('/api/askQuick', async (req, res) => {
     try {
       const { question, circuitContext } = req.body;
