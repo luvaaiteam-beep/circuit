@@ -64,12 +64,12 @@ export const Home = () => {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="relative z-10 max-w-4xl mx-auto"
         >
-          <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight leading-tight mb-6">
+          <h1 className="text-4xl md:text-7xl font-extrabold text-white tracking-tight leading-tight mb-6">
             The world's first free <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">3D circuit simulator</span> <br className="hidden md:block" />
             in your browser.
           </h1>
-          <p className="text-xl text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed">
             Build real circuits with 22 components. Powered by nodal analysis physics. No download. No account required to start.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

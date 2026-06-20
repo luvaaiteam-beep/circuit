@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /sim
 
 Sitemap: https://luvaai.in/sitemap.xml

@@ -20,19 +20,75 @@ const getSelectionBox = (type: string): [number, number, number] => {
   }
 };
 
-const ComponentWrapper = ({ data }: { data: any }) => {
-  const { selectComponent, selectedCompId, updateComponent, removeComponent, setOrbitEnabled, setIsDragging, simRunning, componentVoltages, componentCurrents } = useCircuitStore();
-  const isSelected = selectedCompId === data.id;
-  const { camera, raycaster, pointer, scene } = useThree();
-  const [dragOffset, setDragOffset] = useState<THREE.Vector3 | null>(null);
+let globalDragOffset: THREE.Vector3 | null = null;
+let dragOccurred = false;
 
-  const voltage = componentVoltages[data.id];
-  const current = componentCurrents[data.id];
+const DragController = () => {
+  const { camera, pointer, raycaster, scene } = useThree();
+  useFrame(() => {
+    const { isDragging, draggingCompId, snapToGrid, updateComponent } = useCircuitStore.getState();
+    if (!isDragging || !draggingCompId || !globalDragOffset) return;
+    
+    raycaster.setFromCamera(pointer, camera);
+    const intersects = raycaster.intersectObjects(scene.children, true);
+    const groundHit = intersects.find(i => i.object.userData.isGround);
+    
+    if (groundHit) {
+      const newPos = new THREE.Vector3().copy(groundHit.point).sub(globalDragOffset);
+      let x = newPos.x;
+      let z = newPos.z;
+      if (snapToGrid) {
+        x = Math.round(x * 2) / 2;
+        z = Math.round(z * 2) / 2;
+      }
+      updateComponent(draggingCompId, { position: [x, 0, z] }, true);
+      dragOccurred = true;
+    }
+  });
+  return null;
+};
+
+const ComponentWrapper = React.memo(({ data }: { data: any }) => {
+  const isSelected = useCircuitStore(state => state.selectedCompId === data.id);
+  const simRunning = useCircuitStore(state => state.simRunning);
+  const totalComps = useCircuitStore(state => state.components.length);
+  const voltage = useCircuitStore(state => state.componentVoltages[data.id]);
+  const current = useCircuitStore(state => state.componentCurrents[data.id]);
+  
+  const { camera, raycaster, pointer, scene } = useThree();
+
+  const prevV = useRef<number | undefined>();
+  const prevI = useRef<number | undefined>();
+  const displayV = useRef<number | undefined>();
+  const displayI = useRef<number | undefined>();
+
+  if (voltage !== undefined && (prevV.current === undefined || Math.abs(voltage - (prevV.current || 0)) > 0.01)) {
+    displayV.current = voltage;
+    prevV.current = voltage;
+  } else if (voltage !== undefined && displayV.current === undefined) {
+    displayV.current = voltage;
+    prevV.current = voltage;
+  }
+  
+  if (current !== undefined && (prevI.current === undefined || Math.abs(current - (prevI.current || 0)) > 0.001)) {
+    displayI.current = current;
+    prevI.current = current;
+  } else if (current !== undefined && displayI.current === undefined) {
+    displayI.current = current;
+    prevI.current = current;
+  }
+  
+  if (!simRunning) {
+    displayV.current = undefined;
+    displayI.current = undefined;
+    prevV.current = undefined;
+    prevI.current = undefined;
+  }
 
   const handleClick = (e: any) => {
     e.stopPropagation();
-    const { activeTool, isDragging } = useCircuitStore.getState();
-    if (activeTool === 'select' && !isDragging) {
+    const { activeTool, isDragging, selectComponent, removeComponent } = useCircuitStore.getState();
+    if (activeTool === 'select' && !isDragging && !dragOccurred) {
       selectComponent(data.id);
     } else if (activeTool === 'delete') {
       removeComponent(data.id);
@@ -41,9 +97,10 @@ const ComponentWrapper = ({ data }: { data: any }) => {
 
   const handlePointerDown = (e: any) => {
     e.stopPropagation();
-    const { activeTool } = useCircuitStore.getState();
+    const { activeTool, selectComponent, setIsDragging, setOrbitEnabled } = useCircuitStore.getState();
     if (activeTool === 'select') {
       selectComponent(data.id);
+      dragOccurred = false;
       
       // Calculate drag offset
       raycaster.setFromCamera(pointer, camera);
@@ -51,8 +108,7 @@ const ComponentWrapper = ({ data }: { data: any }) => {
       const groundHit = intersects.find(i => i.object.userData.isGround);
       
       if (groundHit) {
-        const offset = new THREE.Vector3().copy(groundHit.point).sub(new THREE.Vector3(...data.position));
-        setDragOffset(offset);
+        globalDragOffset = new THREE.Vector3().copy(groundHit.point).sub(new THREE.Vector3(...data.position));
         setIsDragging(true, data.id);
         setOrbitEnabled(false);
         document.body.style.cursor = 'grabbing';
@@ -60,41 +116,21 @@ const ComponentWrapper = ({ data }: { data: any }) => {
     }
   };
 
-  useFrame(() => {
-    const { isDragging, draggingCompId, snapToGrid } = useCircuitStore.getState();
-    if (isDragging && draggingCompId === data.id && dragOffset) {
-      raycaster.setFromCamera(pointer, camera);
-      const intersects = raycaster.intersectObjects(scene.children, true);
-      const groundHit = intersects.find(i => i.object.userData.isGround);
-      
-      if (groundHit) {
-        const newPos = new THREE.Vector3().copy(groundHit.point).sub(dragOffset);
-        let x = newPos.x;
-        let z = newPos.z;
-        if (snapToGrid) {
-          x = Math.round(x * 2) / 2;
-          z = Math.round(z * 2) / 2;
-        }
-        updateComponent(data.id, { position: [x, 0, z] });
-      }
-    }
-  });
-
   return (
     <group 
       onClick={handleClick} 
       onPointerDown={handlePointerDown}
     >
-      {simRunning && (voltage !== undefined || current !== undefined) && (
+      {simRunning && (displayV.current !== undefined || displayI.current !== undefined) && (
         <Html position={[data.position[0], (data.position[1] || 0) + 1.5, data.position[2]]} center style={{ opacity: 0.9, pointerEvents: 'none' }}>
           <div className="px-2 py-1 bg-zinc-950/80 border border-zinc-800 rounded text-[10px] font-mono text-cyan-400 whitespace-nowrap backdrop-blur-sm pointer-events-none shadow-[0_0_15px_rgba(34,211,238,0.2)]">
-            {voltage !== undefined && `${Math.abs(voltage).toFixed(2)}V`}
-            {voltage !== undefined && current !== undefined && ' | '}
-            {current !== undefined && `${(Math.abs(current) * 1000).toFixed(1)}mA`}
+            {displayV.current !== undefined && `${Math.abs(displayV.current).toFixed(2)}V`}
+            {displayV.current !== undefined && displayI.current !== undefined && ' | '}
+            {displayI.current !== undefined && `${(Math.abs(displayI.current) * 1000).toFixed(1)}mA`}
           </div>
         </Html>
       )}
-      {!simRunning && (
+      {!simRunning && (isSelected || totalComps <= 5) && (
         <Html position={[data.position[0], (data.position[1] || 0) + 1.5, data.position[2]]} center style={{ opacity: 0.6, pointerEvents: 'none' }}>
            <div className="px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded font-mono text-[9px] text-zinc-500 whitespace-nowrap shadow-xl uppercase">
              {data.type}_{data.id.substring(0,4)}
@@ -131,7 +167,17 @@ const ComponentWrapper = ({ data }: { data: any }) => {
       {data.type === 'relay' && <Relay data={data} />}
     </group>
   );
-};
+}, (prev, next) => {
+  return prev.data.id === next.data.id &&
+         prev.data.position[0] === next.data.position[0] &&
+         prev.data.position[1] === next.data.position[1] &&
+         prev.data.position[2] === next.data.position[2] &&
+         prev.data.rotation[0] === next.data.rotation[0] &&
+         prev.data.rotation[1] === next.data.rotation[1] &&
+         prev.data.rotation[2] === next.data.rotation[2] &&
+         prev.data.type === next.data.type &&
+         JSON.stringify(prev.data.properties) === JSON.stringify(next.data.properties);
+});
 
 const Ground = () => {
   const { addComponent, updateComponent, setWirePhase } = useCircuitStore();
@@ -208,6 +254,39 @@ const PreviewWire = () => {
   );
 };
 
+const CameraController = () => {
+  const { camera } = useThree();
+  const { zoomToFitRequested, setZoomToFitRequested, components } = useCircuitStore();
+
+  React.useEffect(() => {
+    if (zoomToFitRequested && components.length > 0) {
+      const box = new THREE.Box3();
+      components.forEach(c => {
+        box.expandByPoint(new THREE.Vector3(c.position[0], c.position[1], c.position[2]));
+      });
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      const maxDim = Math.max(size.x, size.z, 8);
+      const fov = (camera as any).fov || 55;
+      const dist = maxDim / (2 * Math.tan((Math.PI * fov) / 360));
+      
+      // We do a discrete jump for simplicity instead of lerp to avoid frame-counting logic
+      // But we can just set position directly
+      camera.position.set(center.x, dist, center.z + dist * 0.5);
+      camera.lookAt(center);
+      setZoomToFitRequested(false);
+    } else if (zoomToFitRequested) {
+      camera.position.set(0, 15, 22);
+      camera.lookAt(0, 0, 0);
+      setZoomToFitRequested(false);
+    }
+  }, [zoomToFitRequested, components, camera, setZoomToFitRequested]);
+
+  return null;
+};
+
 export const Scene = () => {
   const components = useCircuitStore(state => state.components);
   const orbitEnabled = useCircuitStore(state => state.orbitEnabled);
@@ -217,6 +296,7 @@ export const Scene = () => {
     const handlePointerUp = () => {
       const state = useCircuitStore.getState();
       if (state.isDragging) {
+        state.pushHistory();
         state.setIsDragging(false, null);
         state.setOrbitEnabled(true);
         document.body.style.cursor = 'auto';
@@ -237,17 +317,22 @@ export const Scene = () => {
         </div>
       )}
       <Canvas 
-        shadows 
+        shadows={false}
         camera={{ position: [0, 15, 22], fov: 55 }}
         onCreated={() => setIsLoaded(true)}
-        gl={{ preserveDrawingBuffer: true }}
+        gl={{ preserveDrawingBuffer: true, antialias: window.devicePixelRatio < 2 }}
+        dpr={[1, 2]}
         id="circuit-canvas"
+        style={{ touchAction: 'none' }}
+        onPointerMissed={() => useCircuitStore.getState().selectComponent(null)}
       >
+        <DragController />
+        <CameraController />
         <color attach="background" args={['#09090b']} />
         <fogExp2 attach="fog" args={['#09090b', 0.015]} />
         
         <ambientLight intensity={0.6} color="#ffffff" />
-        <directionalLight position={[15, 25, 10]} intensity={1.2} color="#ffffff" castShadow />
+        <directionalLight position={[15, 25, 10]} intensity={1.2} color="#ffffff" />
         <directionalLight position={[-10, 5, -10]} intensity={0.5} color="#a1a1aa" />
         <pointLight position={[0, 10, 0]} intensity={0.8} color="#00e5ff" distance={40} />
 

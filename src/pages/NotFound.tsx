@@ -14,6 +14,7 @@ export const NotFound = () => {
       <Helmet>
         <title>Page Not Found | CircuitForge</title>
         <meta name="description" content="The page you are looking for does not exist on CircuitForge." />
+        <meta name="robots" content="noindex" />
       </Helmet>
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}

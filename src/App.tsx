@@ -33,7 +33,7 @@ export default function App() {
                 "@type": "ListItem",
                 "position": 2,
                 "name": "Simulator",
-                "item": "https://luvaai.in/sim"
+                "item": "https://luvaai.in/simulator"
               }
             ]
           })}
@@ -45,7 +45,7 @@ export default function App() {
         <p>Interactive circuit building environment. Place components onto the canvas, wire them together, and run real-time electronic simulations. Supported tools include selection, wiring, and deletion. Connect batteries, switches, resistors, and more to test your circuit designs.</p>
       </div>
 
-      <div className="fixed inset-0 w-full h-full touch-none">
+      <div className="fixed inset-0 w-full h-full">
         <ErrorBoundary>
           <Scene />
         </ErrorBoundary>

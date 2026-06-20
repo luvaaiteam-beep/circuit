@@ -1,0 +1,10 @@
+{
+  "name": "CircuitForge",
+  "short_name": "CircuitForge",
+  "description": "Free 3D browser circuit simulator",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

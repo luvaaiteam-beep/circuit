@@ -49,8 +49,15 @@ interface CircuitState {
   logs: LogEntry[];
   clipboard: ComponentData | null;
 
+  circuitName: string;
+  zoomToFitRequested: boolean;
+
   addLog: (msg: string, type?: 'info' | 'cmd' | 'error' | 'success') => void;
   loadCircuit: (data: string) => void;
+
+  setCircuitName: (name: string) => void;
+  zoomToFit: () => void;
+  setZoomToFitRequested: (requested: boolean) => void;
 
   pushHistory: () => void;
   undo: () => void;
@@ -59,7 +66,7 @@ interface CircuitState {
   canRedo: () => boolean;
 
   addComponent: (type: ComponentType, position: [number, number, number]) => void;
-  updateComponent: (id: string, updates: Partial<ComponentData>) => void;
+  updateComponent: (id: string, updates: Partial<ComponentData>, skipHistory?: boolean) => void;
   removeComponent: (id: string) => void;
   addWire: (from: { compId: string; pinIdx: number }, to: { compId: string; pinIdx: number }) => void;
   removeWire: (id: string) => void;
@@ -128,6 +135,12 @@ export const useCircuitStore = create<CircuitState>((set, get) => ({
   toastMessage: null,
   toastType: 'info',
   logs: [{ id: uuidv4(), time: new Date().toLocaleTimeString(), msg: 'System initialized. Ready for input.', type: 'info' }],
+  circuitName: 'Untitled Circuit',
+  zoomToFitRequested: false,
+
+  setCircuitName: (name) => set({ circuitName: name }),
+  zoomToFit: () => set({ zoomToFitRequested: true }),
+  setZoomToFitRequested: (requested) => set({ zoomToFitRequested: requested }),
 
   addLog: (msg, type = 'info') => set((state) => ({
     logs: [...state.logs, { id: uuidv4(), time: new Date().toLocaleTimeString(), msg, type }].slice(-100)
@@ -136,7 +149,13 @@ export const useCircuitStore = create<CircuitState>((set, get) => ({
   loadCircuit: (data) => {
     try {
       const parsed = JSON.parse(data);
-      set({ components: parsed.components || [], wires: parsed.wires || [], selectedCompId: null, simRunning: false });
+      set({ 
+        components: parsed.components || [], 
+        wires: parsed.wires || [], 
+        selectedCompId: null, 
+        simRunning: false,
+        ...(parsed.circuitName ? { circuitName: parsed.circuitName } : {})
+      });
       get().addLog('Circuit loaded successfully.', 'success');
     } catch (e) {
       get().addLog('Failed to load circuit. Invalid JSON.', 'error');
@@ -191,8 +210,10 @@ export const useCircuitStore = create<CircuitState>((set, get) => ({
     });
   },
 
-  updateComponent: (id, updates) => {
-    get().pushHistory();
+  updateComponent: (id, updates, skipHistory = false) => {
+    if (!skipHistory) {
+      get().pushHistory();
+    }
     set((state) => ({
       components: state.components.map(c => c.id === id ? { ...c, ...updates } : c)
     }));

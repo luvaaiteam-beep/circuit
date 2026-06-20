@@ -97,7 +97,7 @@ export const Gallery = () => {
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between mb-12"
+          className="flex flex-col md:flex-row items-center justify-between gap-4 mb-12"
         >
           <div className="flex items-center gap-4">
             <Link to="/" className="p-2 bg-zinc-900 border border-zinc-800 rounded-lg hover:bg-zinc-800 transition-colors">
