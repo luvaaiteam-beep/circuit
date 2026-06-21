@@ -1,10 +1,10 @@
 {
-  "projectId": "remixed-project-id",
-  "appId": "remixed-app-id",
-  "apiKey": "remixed-api-key",
-  "authDomain": "remixed-auth-domain",
-  "firestoreDatabaseId": "remixed-firestore-database-id",
-  "storageBucket": "remixed-storage-bucket",
-  "messagingSenderId": "remixed-messaging-sender-id",
-  "measurementId": "remixed-measurement-id"
+  "projectId": "straight-bee-t5w43",
+  "appId": "1:704320439414:web:4a30012c27c4f1a43bcb57",
+  "apiKey": "AIzaSyAHe72fXup_R23lriDX979rJRJaYZPlGJc",
+  "authDomain": "straight-bee-t5w43.firebaseapp.com",
+  "firestoreDatabaseId": "ai-studio-479404be-18f0-4c55-abfe-528f1445cd96",
+  "storageBucket": "straight-bee-t5w43.firebasestorage.app",
+  "messagingSenderId": "704320439414",
+  "measurementId": ""
 }

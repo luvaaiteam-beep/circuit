@@ -29,21 +29,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       
-      // On first sign-in, create a Firestore document
       await setDoc(doc(db, 'users', user.uid), {
         email: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL,
         createdAt: serverTimestamp()
       }, { merge: true });
+      
     } catch (error) {
       console.error("Error signing in with Google", error);
       let errMsg = error instanceof Error ? error.message : String(error);
+      
       if (errMsg.includes('popup-closed-by-user')) {
-        errMsg = "Sign-in popup was closed before finishing.";
+        errMsg = "Sign-in popup was closed before finishing (or blocked by preview iframe). Please try opening the app in a new tab if you are in the AI Studio preview.";
       } else if (errMsg.includes('Cross-Origin-Opener-Policy') || errMsg.includes('popup-blocked')) {
         errMsg = "Sign-in popup blocked. Please open this app in a new tab to sign in, or allow popups.";
+      } else if (errMsg.includes('auth/unauthorized-domain')) {
+        errMsg = "Domain not authorized. Please add this app's URL to Authorized Domains in Firebase Console.";
+      } else if (errMsg.includes('sandbox')) {
+        errMsg = "Sign in blocked by preview sandbox. Please click the 'open in new tab' icon to use sign-in.";
       }
+      
       import('../store').then(({ useCircuitStore }) => {
         useCircuitStore.getState().showToast(errMsg, 'error');
       });

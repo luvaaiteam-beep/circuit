@@ -7,6 +7,11 @@ import { GoogleGenAI } from '@google/genai';
 
 const SYSTEM_PROMPT = "You are CircuitForge AI, an expert electronics engineer and educator embedded in a 3D circuit simulator. Help users understand their circuits, debug problems, explain components, and suggest improvements. Be concise, practical, and friendly. When referencing components use their simulator names. Format numbers with units (e.g. 14.9mA, 470Ω, 9V). Never use markdown headers in responses — use plain conversational text only.";
 
+const VALID_ROUTES = new Set([
+  '/', '/sim', '/simulator', '/gallery', '/features', '/about', '/privacy', '/terms'
+]);
+const VALID_PREFIXES = ['/shared/', '/embed/'];
+
 let geminiClient: GoogleGenAI | null = null;
 function getGeminiClient(): GoogleGenAI {
   if (!geminiClient) {
@@ -89,12 +94,31 @@ async function startServer() {
       server: { middlewareMode: true },
       appType: 'spa',
     });
+    
+    // Add middleware to block unknown non-asset routes with 410 in dev
+    app.use((req, res, next) => {
+      const isInternal = req.path.startsWith('/@') || req.path.startsWith('/src/') || req.path.startsWith('/node_modules/');
+      const hasExt = /\.[a-zA-Z0-9]+$/.test(req.path);
+      const isSpa = VALID_ROUTES.has(req.path) || VALID_PREFIXES.some(p => req.path.startsWith(p));
+      const isApi = req.path.startsWith('/api/');
+      
+      if (!isInternal && !hasExt && !isSpa && !isApi) {
+        return res.status(410).send('410 Gone - This page has been permanently removed.');
+      }
+      next();
+    });
+
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*all', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+      const isSpa = VALID_ROUTES.has(req.path) || VALID_PREFIXES.some(p => req.path.startsWith(p));
+      if (isSpa) {
+        res.sendFile(path.join(distPath, 'index.html'));
+      } else {
+        res.status(410).send('410 Gone - This page has been permanently removed.');
+      }
     });
   }
 
