@@ -1,4 +1,5 @@
 import { ComponentData, WireData } from '../store';
+import { auth } from '../firebase';
 
 export type ChatMessage = { role: 'user' | 'assistant', content: string };
 
@@ -34,9 +35,18 @@ export async function* streamAsk(
   history: ChatMessage[],
   circuitContext: string
 ): AsyncGenerator<string> {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error('Please sign in to use the AI assistant.');
+  }
+  
+  const token = await user.getIdToken();
   const response = await fetch('/api/streamAsk', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
     body: JSON.stringify({ userMessage, history, circuitContext }),
   });
 

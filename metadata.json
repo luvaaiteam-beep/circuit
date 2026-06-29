@@ -1,5 +1,6 @@
 {
-  "name": "Remix: Untitled",
-  "description": "these are two versions of an online web wire and electric components simulator, take both of them as base, fix all the problems and errors by running and checking if its okay. and then make a bettter model with more features, and completely error free.",
-  "requestFramePermissions": []
+  "name": "Luvaai",
+  "description": "A stunning, futuristic digital logic circuit simulator app with AI assistant.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

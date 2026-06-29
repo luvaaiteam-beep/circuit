@@ -2,8 +2,13 @@ import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
+import * as admin from 'firebase-admin';
+import { getAuth } from 'firebase-admin/auth';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
+
+admin.initializeApp();
 
 const SYSTEM_PROMPT = "You are CircuitForge AI, an expert electronics engineer and educator embedded in a 3D circuit simulator. Help users understand their circuits, debug problems, explain components, and suggest improvements. Be concise, practical, and friendly. When referencing components use their simulator names. Format numbers with units (e.g. 14.9mA, 470Ω, 9V). Never use markdown headers in responses — use plain conversational text only.";
 
@@ -24,18 +29,51 @@ function getGeminiClient(): GoogleGenAI {
   return geminiClient;
 }
 
+const verifyFirebaseToken = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Missing or invalid authentication token' });
+  }
+  const token = authHeader.split('Bearer ')[1];
+  try {
+    const decodedToken = await getAuth().verifyIdToken(token);
+    (req as any).user = decodedToken;
+    next();
+  } catch (error) {
+    console.error('Firebase Auth Error:', error);
+    return res.status(401).json({ error: 'Unauthorized access' });
+  }
+};
+
 async function startServer() {
   const app = express();
   const PORT = Number(process.env.PORT) || 3000;
 
-  app.use(cors());
+  const corsOptions = {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      const allowedOrigins = ['https://luvaai.in', 'http://localhost:3000', 'http://localhost:5173'];
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.run.app')) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    }
+  };
+  
+  app.use(cors(corsOptions));
   app.use(express.json());
 
   app.get('/api/ping', (req, res) => {
     res.status(200).send('pong');
   });
 
-  app.post('/api/askQuick', async (req, res) => {
+  const aiLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 20, // 20 requests per minute
+    message: { error: 'Too many requests, please try again later.' }
+  });
+
+  app.post('/api/askQuick', aiLimiter, async (req, res) => {
     try {
       const { question, circuitContext } = req.body;
       const client = getGeminiClient();
@@ -52,7 +90,7 @@ async function startServer() {
     }
   });
 
-  app.post('/api/streamAsk', async (req, res) => {
+  app.post('/api/streamAsk', aiLimiter, verifyFirebaseToken, async (req, res) => {
     try {
       const { userMessage, history, circuitContext } = req.body;
       const client = getGeminiClient();
@@ -95,7 +133,7 @@ async function startServer() {
       appType: 'spa',
     });
     
-    // Add middleware to block unknown non-asset routes with 410 in dev
+    // Set 410 status for unknown non-asset routes but let SPA handle rendering
     app.use((req, res, next) => {
       const isInternal = req.path.startsWith('/@') || req.path.startsWith('/src/') || req.path.startsWith('/node_modules/');
       const hasExt = /\.[a-zA-Z0-9]+$/.test(req.path);
@@ -103,7 +141,7 @@ async function startServer() {
       const isApi = req.path.startsWith('/api/');
       
       if (!isInternal && !hasExt && !isSpa && !isApi) {
-        return res.status(410).send('410 Gone - This page has been permanently removed.');
+        res.status(410);
       }
       next();
     });
@@ -114,11 +152,10 @@ async function startServer() {
     app.use(express.static(distPath));
     app.get('*all', (req, res) => {
       const isSpa = VALID_ROUTES.has(req.path) || VALID_PREFIXES.some(p => req.path.startsWith(p));
-      if (isSpa) {
-        res.sendFile(path.join(distPath, 'index.html'));
-      } else {
-        res.status(410).send('410 Gone - This page has been permanently removed.');
+      if (!isSpa) {
+        res.status(410);
       }
+      res.sendFile(path.join(distPath, 'index.html'));
     });
   }
 

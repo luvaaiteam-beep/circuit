@@ -57,10 +57,10 @@ const ComponentWrapper = React.memo(({ data }: { data: any }) => {
   
   const { camera, raycaster, pointer, scene } = useThree();
 
-  const prevV = useRef<number | undefined>();
-  const prevI = useRef<number | undefined>();
-  const displayV = useRef<number | undefined>();
-  const displayI = useRef<number | undefined>();
+  const prevV = useRef<number | undefined>(undefined);
+  const prevI = useRef<number | undefined>(undefined);
+  const displayV = useRef<number | undefined>(undefined);
+  const displayI = useRef<number | undefined>(undefined);
 
   if (voltage !== undefined && (prevV.current === undefined || Math.abs(voltage - (prevV.current || 0)) > 0.01)) {
     displayV.current = voltage;
