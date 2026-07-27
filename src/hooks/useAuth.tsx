@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { User, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged } from 'firebase/auth';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
+import { User, signInWithRedirect, getRedirectResult, signOut as firebaseSignOut, onAuthStateChanged } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../firebase';
 
@@ -16,6 +16,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const redirectChecked = useRef(false);
+  useEffect(() => {
+    if (redirectChecked.current) return;
+    redirectChecked.current = true;
+
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (result && result.user) {
+          const user = result.user;
+          await setDoc(doc(db, 'users', user.uid), {
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            createdAt: serverTimestamp()
+          }, { merge: true });
+        }
+      })
+      .catch((error) => {
+        console.error("Error completing Google sign-in:", error);
+        let errMsg = error instanceof Error ? error.message : String(error);
+        if (errMsg.includes('auth/unauthorized-domain')) {
+          errMsg = "Domain not authorized. Add this app's URL to Authorized Domains in Firebase Console.";
+        }
+        import('../store').then(({ useCircuitStore }) => {
+          useCircuitStore.getState().showToast(errMsg, 'error');
+        });
+      });
+  }, []);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -26,41 +55,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signInWithGoogle = async () => {
-    // Detect if we are running in an iframe (AI Studio preview)
-    const isIframe = window.self !== window.top;
-    if (isIframe) {
-      import('../store').then(({ useCircuitStore }) => {
-        useCircuitStore.getState().showToast(
-          "Google Sign-In is blocked in preview. Please click 'Open in new tab' (arrow icon top right) to sign in.", 
-          'error'
-        );
-      });
-      return;
-    }
-
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      if (result && result.user) {
-        const user = result.user;
-        await setDoc(doc(db, 'users', user.uid), {
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          createdAt: serverTimestamp()
-        }, { merge: true });
-      }
+      await signInWithRedirect(auth, googleProvider);
     } catch (error) {
-      console.error("Error signing in with Google:", error);
+      console.error("Error starting Google sign-in:", error);
       let errMsg = error instanceof Error ? error.message : String(error);
-      
       if (errMsg.includes('auth/unauthorized-domain')) {
-        errMsg = "Domain not authorized. Please add this app's URL to Authorized Domains in Firebase Console.";
-      } else if (errMsg.includes('auth/popup-closed-by-user')) {
-        errMsg = "Sign-in cancelled.";
-      } else if (errMsg.includes('Cross-Origin-Opener-Policy')) {
-        errMsg = "Popup blocked due to cross-origin policy. Try opening the app in a new tab.";
+        errMsg = "Domain not authorized. Add this app's URL to Authorized Domains in Firebase Console.";
       }
-      
       import('../store').then(({ useCircuitStore }) => {
         useCircuitStore.getState().showToast(errMsg, 'error');
       });

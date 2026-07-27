@@ -14,22 +14,40 @@ export const Gallery = () => {
   const [myCircuits, setMyCircuits] = useState<SavedCircuit[]>([]);
   const [loading, setLoading] = useState(true);
   const [circuitToDelete, setCircuitToDelete] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadData = () => {
     setLoading(true);
+    setError(null);
     if (activeTab === 'public') {
-      loadPublicGallery().then(items => {
-        setPublicCircuits(items);
-        setLoading(false);
-      });
+      loadPublicGallery()
+        .then(items => {
+          setPublicCircuits(items);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error(err);
+          setError("Failed to load public gallery.");
+          setLoading(false);
+        });
     } else if (user) {
-      loadUserCircuits(user.uid).then(items => {
-        setMyCircuits(items);
-        setLoading(false);
-      });
+      loadUserCircuits(user.uid)
+        .then(items => {
+          setMyCircuits(items);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error(err);
+          setError("Failed to load your circuits.");
+          setLoading(false);
+        });
     } else {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    loadData();
   }, [activeTab, user]);
 
   const handleDelete = (circuitId: string) => {
@@ -127,6 +145,21 @@ export const Gallery = () => {
               <div key={i} className="bg-zinc-900/50 border border-zinc-800 rounded-xl h-48 animate-pulse"></div>
             ))}
           </div>
+        ) : error ? (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-24 bg-zinc-900/30 border border-zinc-800 rounded-2xl"
+          >
+            <Layers size={48} className="mx-auto text-red-500 mb-4" />
+            <h2 className="text-xl font-bold text-zinc-300 mb-2">{error}</h2>
+            <button 
+              onClick={loadData}
+              className="mt-4 px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white font-medium rounded-lg transition-colors"
+            >
+              Retry
+            </button>
+          </motion.div>
         ) : activeTab === 'public' ? (
           publicCircuits.length === 0 ? (
             <motion.div 

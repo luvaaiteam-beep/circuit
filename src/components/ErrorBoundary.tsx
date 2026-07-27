@@ -8,14 +8,16 @@ interface Props {
 interface State {
   hasError: boolean;
   error?: Error;
+  errorKey: number;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
-    hasError: false
+    hasError: false,
+    errorKey: 0
   };
 
-  public static getDerivedStateFromError(error: Error): State {
+  public static getDerivedStateFromError(error: Error): Partial<State> {
     return { hasError: true, error };
   }
 
@@ -36,7 +38,7 @@ export class ErrorBoundary extends Component<Props, State> {
             {this.state.error?.message || 'Unknown render error.'}
           </div>
           <button
-            onClick={() => this.setState({ hasError: false })}
+            onClick={() => this.setState(prev => ({ hasError: false, errorKey: prev.errorKey + 1 }))}
             className="px-6 py-2 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 border border-cyan-500/30 rounded font-medium transition-all"
           >
             Attempt Restart Engine
@@ -45,6 +47,6 @@ export class ErrorBoundary extends Component<Props, State> {
       );
     }
 
-    return this.props.children;
+    return <React.Fragment key={this.state.errorKey}>{this.props.children}</React.Fragment>;
   }
 }

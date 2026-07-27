@@ -58,7 +58,7 @@ export const About = () => {
 
             <h2 className="text-2xl font-bold text-white mt-12 mb-4">Our Mission</h2>
             <p>
-              To democratize electronics education. CircuitForge is free, requires no login to start experimenting, and features an open-source framework you can download and tweak to your liking. 
+              To democratize electronics education. CircuitForge is free, requires no login to start experimenting, and is built with modern open-source technologies.
             </p>
 
             <div className="mt-16 p-8 bg-zinc-900 border border-zinc-800 rounded-2xl text-center">

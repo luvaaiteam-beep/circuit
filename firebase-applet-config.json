@@ -1,10 +1,9 @@
 {
-  "projectId": "straight-bee-t5w43",
-  "appId": "1:704320439414:web:4a30012c27c4f1a43bcb57",
-  "apiKey": "AIzaSyAHe72fXup_R23lriDX979rJRJaYZPlGJc",
-  "authDomain": "straight-bee-t5w43.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-479404be-18f0-4c55-abfe-528f1445cd96",
-  "storageBucket": "straight-bee-t5w43.firebasestorage.app",
-  "messagingSenderId": "704320439414",
-  "measurementId": ""
+  "apiKey": "AIzaSyAjuxF9vjF3Z_u-FsFDolwDVmj6gHE0Pr4",
+  "authDomain": "gen-lang-client-0257356521.firebaseapp.com",
+  "projectId": "gen-lang-client-0257356521",
+  "storageBucket": "gen-lang-client-0257356521.firebasestorage.app",
+  "messagingSenderId": "870369285033",
+  "appId": "1:870369285033:web:da19840fd4b8114e5a6ab8",
+  "firestoreDatabaseId": "ai-studio-ad5f8aae-b340-4838-b773-14f98c796992"
 }

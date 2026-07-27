@@ -107,8 +107,14 @@ export const Privacy = () => {
 
           <section>
             <h2 className="text-2xl font-bold text-white mb-4">4. Cookies and Local Storage</h2>
+            <p className="mb-3">
+              CircuitForge uses standard browser local storage and essential cookies to maintain your session, store local draft circuits, and remember your interface preferences (e.g., active tools, minimap state).
+            </p>
+            <p className="mb-3">
+              We use Google Analytics to understand how users interact with our platform. Google Analytics collects anonymous usage data via cookies to report on website trends. Additionally, Google AdSense (when active) uses cookies to serve personalized or non-personalized ads based on your visits to our site and other sites on the Internet.
+            </p>
             <p>
-              CircuitForge uses standard browser local storage and essential cookies to maintain your session, store local draft circuits, and remember your interface preferences (e.g., active tools, minimap state). We do not use third-party tracking cookies for advertising.
+              You can manage your ad preferences and opt-out of personalized advertising by visiting <a href="https://myadcenter.google.com/" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Google's Ad Settings</a>. You may also use the cookie consent banner on our site to opt-out of non-essential analytics cookies.
             </p>
           </section>
 

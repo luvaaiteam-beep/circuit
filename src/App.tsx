@@ -9,12 +9,14 @@ import { UI } from './components/UI';
 import { Onboarding } from './components/Onboarding';
 import { useCircuitStore } from './store';
 import { Helmet } from 'react-helmet-async';
+import { CookieConsent } from './components/CookieConsent';
 
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 export default function App() {
   return (
     <div className="w-screen h-screen bg-[#09090b] text-zinc-300 font-sans overflow-hidden select-none">
+      <CookieConsent />
       <Helmet>
         <title>Simulator | CircuitForge</title>
         <meta name="description" content="Build and simulate electronic circuits in 3D right in your browser. Add resistors, batteries, LEDs, and logic gates." />
