@@ -1,12 +1,27 @@
+import { Navigation } from '../components/Navigation';
+import { Footer } from '../components/Footer';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { Battery, Zap, Lightbulb, ToggleLeft, Settings, Trash2, MousePointer2, GitCommitHorizontal, RotateCw, Play, Square, Activity, Terminal, Cpu, Layers, Download, Upload, ArrowRightToLine, Magnet, Fan, Volume2, Gauge, SlidersHorizontal, Triangle, Repeat, Minus, Sun, CircleDot, Circle, Sparkles, ArrowRightLeft, ToggleRight } from 'lucide-react';
+import { Battery, Zap, Lightbulb, ToggleLeft, Settings, Trash2, MousePointer2, GitCommitHorizontal, RotateCw, Play, Square, Activity, Terminal, Cpu, Layers, Download, Upload, ArrowRightToLine, Magnet, Fan, Volume2, Gauge, SlidersHorizontal, Triangle, Repeat, Minus, Sun, CircleDot, Circle, Sparkles, ArrowRightLeft, ToggleRight, X } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { ParticlesBackground } from '../components/ParticlesBackground';
 
 export const Home = () => {
   const { user, loading, signInWithGoogle } = useAuth();
+  const [isMultisimBannerVisible, setIsMultisimBannerVisible] = useState(false);
+
+  useEffect(() => {
+    const dismissed = localStorage.getItem('cf_multisim_banner_dismissed');
+    if (!dismissed) {
+      setIsMultisimBannerVisible(true);
+    }
+  }, []);
+
+  const dismissBanner = () => {
+    localStorage.setItem('cf_multisim_banner_dismissed', 'true');
+    setIsMultisimBannerVisible(false);
+  };
   
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-cyan-500/30 relative">
@@ -15,45 +30,36 @@ export const Home = () => {
       </div>
 
       {/* SECTION 7A — NAV BAR */}
-      <motion.nav 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="sticky top-0 z-50 bg-zinc-950/80 backdrop-blur border-b border-zinc-800 px-6 py-4 flex items-center justify-between"
-      >
-        <div className="flex items-center gap-2 text-xl font-bold tracking-tight">
-          <span className="text-white">Circuit</span>
-          <span className="text-cyan-400">⚡Forge</span>
-        </div>
-        
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-          <Link to="/features" className="hover:text-cyan-400 transition-colors">Features</Link>
-          <Link to="/gallery" className="hover:text-cyan-400 transition-colors">Gallery</Link>
-          <Link to="/about" className="hover:text-cyan-400 transition-colors">About</Link>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          {!loading && (
-            user ? (
-              <div className="flex items-center gap-4">
-                <img src={user.photoURL || ''} alt="User" className="w-8 h-8 rounded-full border border-zinc-700" />
-                <Link to="/sim" className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold rounded text-sm transition-all shadow-[0_0_15px_rgba(34,211,238,0.3)]">
-                  Launch Simulator
+      <Navigation />
+
+      <AnimatePresence>
+        {isMultisimBannerVisible && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="bg-amber-500/10 border-b border-amber-500/30 relative z-40 overflow-hidden"
+          >
+            <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
+              <div className="flex-1 flex items-center justify-center gap-2 text-sm text-amber-200">
+                <span className="font-medium text-center">
+                  Multisim Live is shutting down September 15, 2026 — CircuitForge is the free replacement.
+                </span>
+                <Link to="/multisim-alternative" className="text-amber-400 font-bold hover:underline whitespace-nowrap">
+                  Learn more →
                 </Link>
               </div>
-            ) : (
-              <div className="flex items-center gap-4">
-                <button onClick={signInWithGoogle} className="text-sm font-medium text-zinc-300 hover:text-white transition-colors">
-                  Sign in
-                </button>
-                <Link to="/sim" className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold rounded text-sm transition-all shadow-[0_0_15px_rgba(34,211,238,0.3)]">
-                  Launch Simulator
-                </Link>
-              </div>
-            )
-          )}
-        </div>
-      </motion.nav>
+              <button 
+                onClick={dismissBanner}
+                className="text-amber-400/50 hover:text-amber-400 transition-colors p-1"
+                aria-label="Dismiss banner"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* SECTION 7B — HERO */}
       <section className="relative pt-32 pb-20 px-6 overflow-hidden flex flex-col items-center text-center">
@@ -247,38 +253,17 @@ export const Home = () => {
       </section>
 
       {/* SECTION 7I — FOOTER */}
-      <footer className="bg-zinc-950 relative z-10 border-t border-zinc-800 py-12 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="text-zinc-400 font-medium">
-            <span className="text-white font-bold">CircuitForge</span> by luvaai.in
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-zinc-500">
-            <Link to="/sim" className="hover:text-cyan-400 transition-colors">Simulator</Link>
-            <Link to="/gallery" className="hover:text-cyan-400 transition-colors">Gallery</Link>
-            <Link to="/features" className="hover:text-cyan-400 transition-colors">Features</Link>
-            <Link to="/about" className="hover:text-cyan-400 transition-colors">About</Link>
-            <Link to="/privacy" className="hover:text-cyan-400 transition-colors">Privacy</Link>
-            <Link to="/terms" className="hover:text-cyan-400 transition-colors">Terms</Link>
-            <a href="mailto:luvaai.team@gmail.com" className="hover:text-cyan-400 transition-colors">Contact</a>
-          </div>
-          <div className="text-zinc-600 text-sm">
-            Built with React + Three.js + Gemini AI
-          </div>
-        </div>
-        <div className="max-w-7xl mx-auto mt-8 text-center text-zinc-600 text-sm">
-          © 2026 luvaai.in — Free forever.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
 
 const FeatureCard = ({ icon, title, desc, index }: { icon: React.ReactNode, title: string, desc: string, index: number }) => (
   <motion.div 
-    initial={{ opacity: 0, y: 20 }}
+    initial={{ opacity: 0, y: 50 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
-    transition={{ delay: index * 0.1 }}
+    transition={{ delay: index * 0.1, duration: 0.5 }}
     className="bg-zinc-900 p-8 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-colors"
   >
     <div className="w-12 h-12 rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-center mb-6">

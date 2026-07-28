@@ -1,20 +1,36 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { loadPublicGallery, loadUserCircuits, deleteCircuit, GalleryItem, SavedCircuit } from '../services/circuitService';
-import { Layers, ArrowLeft, Play, Trash2 } from 'lucide-react';
+import { loadPublicGallery, loadUserCircuits, deleteCircuit, GalleryItem, SavedCircuit, reportCircuit } from '../services/circuitService';
+import { Layers, ArrowLeft, Play, Trash2, Flag } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { motion } from 'motion/react';
 import { Helmet } from 'react-helmet-async';
 import { ParticlesBackground } from '../components/ParticlesBackground';
+import { useCircuitStore } from '../store';
+import { Navigation } from '../components/Navigation';
+import { Footer } from '../components/Footer';
 
 export const Gallery = () => {
   const { user } = useAuth();
+  const showToast = useCircuitStore(state => state.showToast);
   const [activeTab, setActiveTab] = useState<'public' | 'my'>('public');
   const [publicCircuits, setPublicCircuits] = useState<GalleryItem[]>([]);
   const [myCircuits, setMyCircuits] = useState<SavedCircuit[]>([]);
   const [loading, setLoading] = useState(true);
   const [circuitToDelete, setCircuitToDelete] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reportedCircuits, setReportedCircuits] = useState<Set<string>>(new Set());
+
+  const handleReport = async (circuitId: string) => {
+    try {
+      await reportCircuit(circuitId);
+      setReportedCircuits(prev => new Set(prev).add(circuitId));
+      showToast("Circuit reported. Thank you.", "success");
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to report circuit.", "error");
+    }
+  };
 
   const loadData = () => {
     setLoading(true);
@@ -71,10 +87,11 @@ export const Gallery = () => {
   };
 
   return (
-    <div className="min-h-screen relative bg-zinc-950 text-zinc-100 font-sans p-6 selection:bg-cyan-500/30">
+    <div className="min-h-screen relative bg-zinc-950 text-zinc-100 font-sans selection:bg-cyan-500/30 flex flex-col">
       <div className="fixed inset-0 z-0 pointer-events-none w-full h-full">
         <ParticlesBackground />
       </div>
+      <Navigation />
       <Helmet>
         <title>Community Gallery | CircuitForge</title>
         <meta name="description" content="Explore and load electronic circuits built by the CircuitForge community." />
@@ -111,16 +128,13 @@ export const Gallery = () => {
           })}
         </script>
       </Helmet>
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto flex-1 w-full px-6">
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col md:flex-row items-center justify-between gap-4 mb-12"
+          className="flex flex-col md:flex-row items-center justify-between gap-4 mb-12 mt-6 px-6 max-w-7xl mx-auto w-full"
         >
           <div className="flex items-center gap-4">
-            <Link to="/" className="p-2 bg-zinc-900 border border-zinc-800 rounded-lg hover:bg-zinc-800 transition-colors">
-              <ArrowLeft size={20} className="text-zinc-400" />
-            </Link>
             <h1 className="text-3xl font-bold text-white">Circuits</h1>
           </div>
           <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg p-1">
@@ -187,8 +201,22 @@ export const Gallery = () => {
                   <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <div className="flex justify-between items-start mb-4 relative z-10">
                     <h3 className="text-lg font-bold text-white truncate pr-4">{circuit.name || 'Untitled Circuit'}</h3>
-                    <div className="px-2 py-1 bg-zinc-800 rounded text-xs font-medium text-zinc-400 whitespace-nowrap">
-                      {circuit.componentCount} comps
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleReport(circuit.id)}
+                        disabled={reportedCircuits.has(circuit.id)}
+                        className={`p-1.5 rounded transition-colors ${
+                          reportedCircuits.has(circuit.id) 
+                            ? 'text-red-500/50 cursor-not-allowed' 
+                            : 'text-zinc-500 hover:text-red-400 hover:bg-red-500/10'
+                        }`}
+                        title="Report Circuit"
+                      >
+                        <Flag size={16} />
+                      </button>
+                      <div className="px-2 py-1 bg-zinc-800 rounded text-xs font-medium text-zinc-400 whitespace-nowrap">
+                        {circuit.componentCount} comps
+                      </div>
                     </div>
                   </div>
                   <p className="text-sm text-zinc-500 mb-6 flex-1 line-clamp-2 relative z-10">
@@ -310,6 +338,7 @@ export const Gallery = () => {
           </motion.div>
         </div>
       )}
+      <Footer />
     </div>
   );
 };

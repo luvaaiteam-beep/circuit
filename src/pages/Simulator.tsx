@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { Cpu, Zap, Share2, Layers, ChevronDown, ChevronUp } from 'lucide-react';
+import { Navigation } from '../components/Navigation';
+import { Footer } from '../components/Footer';
 
 const FAQItem = ({ question, answer }: { question: string, answer: string }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,7 +27,8 @@ const FAQItem = ({ question, answer }: { question: string, answer: string }) => 
 
 export const Simulator = () => {
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-300 font-sans flex flex-col pt-16">
+    <div className="min-h-screen bg-[#09090b] text-zinc-300 font-sans flex flex-col">
+      <Navigation />
       <Helmet>
         <title>Free 3D Circuit Simulator — Build & Test Electronics | CircuitForge</title>
         <link rel="canonical" href="https://luvaai.in/simulator" />
@@ -48,21 +51,6 @@ export const Simulator = () => {
           })}
         </script>
       </Helmet>
-
-      {/* Basic Inline Header instead of missing Navbar */}
-      <header className="fixed top-0 left-0 right-0 h-16 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800 z-50 flex flex-col justify-center">
-        <div className="max-w-7xl mx-auto w-full px-6 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <Cpu className="text-cyan-400" size={24} />
-            <span className="font-mono text-xl text-zinc-100 tracking-tight font-bold">
-              Circuit<span className="text-cyan-400">Forge</span>
-            </span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link to="/sim" className="text-sm font-medium text-cyan-400 border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 rounded hover:bg-cyan-400/20 transition-all">Launch Simulator</Link>
-          </div>
-        </div>
-      </header>
 
       <main className="flex-1">
         {/* Hero Section */}
@@ -159,21 +147,15 @@ export const Simulator = () => {
         {/* CTA */}
         <section className="max-w-4xl mx-auto px-6 py-24 text-center">
           <h2 className="text-3xl font-bold text-zinc-100 mb-6">Ready to start building?</h2>
-          <Link to="/sim" className="inline-block px-8 py-4 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-medium rounded-lg transition-colors text-lg">
+          <Link to="/sim" className="inline-block px-8 py-4 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-medium rounded-lg transition-colors text-lg mb-8">
             Open the Simulator
           </Link>
+          <p className="text-zinc-400 text-sm">
+            Looking for a <Link to="/multisim-alternative" className="text-cyan-400 hover:text-cyan-300 transition-colors">Multisim Live alternative</Link>? CircuitForge is free, browser-based, and requires no download or signup.
+          </p>
         </section>
       </main>
-
-      {/* Inline Footer */}
-      <footer className="border-t border-zinc-800 bg-zinc-950 py-8 text-center text-zinc-500 text-sm">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div>&copy; {new Date().getFullYear()} CircuitForge. All rights reserved.</div>
-          <div className="flex gap-4">
-            <Link to="/sim" className="hover:text-cyan-400 transition-colors">Simulator</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

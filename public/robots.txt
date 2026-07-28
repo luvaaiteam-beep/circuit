@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /simulator
+Allow: /multisim-alternative
 Allow: /
 Disallow: /sim
 

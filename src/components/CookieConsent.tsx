@@ -11,7 +11,7 @@ export const CookieConsent = () => {
       setIsVisible(true);
     } else if (consent === 'essential') {
       // Block GA
-      window['ga-disable-G-XXXXXXXXXX'] = true; // Replace with actual measurement ID if needed, or generally disable GA
+      window['ga-disable-G-Z94X17ZD4K'] = true; // Replace with actual measurement ID if needed, or generally disable GA
     }
   }, []);
 
@@ -22,12 +22,6 @@ export const CookieConsent = () => {
 
   const handleEssentialOnly = () => {
     localStorage.setItem('cf_cookie_consent', 'essential');
-    // Block GA dynamically
-    // Assume standard gtag or similar is used, we can set a global flag or standard disable flag.
-    // To be safe and compliant, we can set window['ga-disable-MEASUREMENT_ID'] = true, 
-    // but without knowing the measurement ID, we can just set a generic property 
-    // or rely on the script checking this local storage value.
-    (window as any).DISABLE_GA = true;
     setIsVisible(false);
   };
 

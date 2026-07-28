@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useCircuitStore, ComponentType, ToolType } from '../store';
 import { Battery, Zap, Lightbulb, ToggleLeft, Settings, Trash2, MousePointer2, GitCommitHorizontal, RotateCw, Play, Square, Activity, Terminal, Cpu, Layers, Download, Upload, ArrowRightToLine, Magnet, Fan, Volume2, SlidersHorizontal, ShieldAlert, Sun, Moon, ToggleRight, Share2, Grid, Camera, LogOut, LogIn, Menu, MoreHorizontal, X, Keyboard, Maximize } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import { Link } from 'react-router-dom';
 import { saveCircuit, shareCircuit } from '../services/circuitService';
 
 const Minimap = () => {
@@ -316,12 +317,16 @@ export const UI = () => {
     <>
       {/* Top Bar */}
       <div className="fixed top-0 left-0 right-0 h-14 bg-zinc-950/90 border-b border-zinc-800 flex items-center px-4 md:px-6 gap-2 md:gap-4 z-50 backdrop-blur-xl overflow-x-auto no-scrollbar">
-        <div className="flex items-center gap-2 shrink-0">
+        <Link to="/" className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity">
           <Cpu className="text-cyan-400" size={20} />
           <div className="font-mono text-base md:text-lg text-zinc-100 tracking-tight font-bold whitespace-nowrap hidden sm:block">
             Circuit<span className="text-cyan-400">Forge</span>
           </div>
-        </div>
+        </Link>
+
+        <Link to="/learn" className="hidden sm:block text-xs font-bold tracking-wider text-zinc-400 hover:text-cyan-400 transition-colors uppercase ml-2 mr-2">
+          Learn
+        </Link>
         
         <div className="w-px h-6 bg-zinc-800 shrink-0 hidden md:block" />
         

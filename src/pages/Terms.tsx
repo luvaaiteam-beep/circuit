@@ -4,13 +4,16 @@ import { Shield } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Helmet } from 'react-helmet-async';
 import { ParticlesBackground } from '../components/ParticlesBackground';
+import { Navigation } from '../components/Navigation';
+import { Footer } from '../components/Footer';
 
 export const Terms = () => {
   return (
-    <div className="min-h-screen relative bg-[#09090b] selection:bg-cyan-500/30 overflow-y-auto">
+    <div className="min-h-screen relative bg-[#09090b] selection:bg-cyan-500/30 overflow-y-auto flex flex-col">
       <div className="fixed inset-0 z-0 pointer-events-none w-full h-full">
         <ParticlesBackground />
       </div>
+      <Navigation />
       <Helmet>
         <title>Terms of Service | CircuitForge</title>
         <meta name="description" content="Terms of Service for using CircuitForge." />
@@ -35,34 +38,11 @@ export const Terms = () => {
           })}
         </script>
       </Helmet>
-      <motion.header 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-50"
-      >
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <Shield className="text-cyan-400" size={24} />
-            <div className="font-mono text-xl text-zinc-100 tracking-tight font-bold">
-              Circuit<span className="text-cyan-400">Forge</span>
-            </div>
-          </Link>
-          <div className="flex items-center gap-6">
-            <Link to="/sim" className="text-sm font-medium text-zinc-300 hover:text-white transition-colors">
-              Simulator
-            </Link>
-            <Link to="/gallery" className="text-sm font-medium text-zinc-300 hover:text-white transition-colors">
-              Gallery
-            </Link>
-          </div>
-        </div>
-      </motion.header>
-
       <motion.main 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="max-w-3xl mx-auto px-6 py-16 text-zinc-300"
+        className="max-w-3xl mx-auto px-6 py-16 text-zinc-300 flex-1 w-full"
       >
         <h1 className="text-4xl font-bold text-white mb-8">Terms of Service</h1>
         <p className="text-sm text-zinc-500 mb-8">Last Updated: June 17, 2026</p>
@@ -139,22 +119,7 @@ export const Terms = () => {
           </section>
         </div>
       </motion.main>
-
-      <motion.footer 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="border-t border-zinc-800 py-12 px-6 mt-12 bg-zinc-950"
-      >
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="text-zinc-600 text-sm">
-            Built with React + Three.js + Gemini AI
-          </div>
-          <div className="text-zinc-600 text-sm">
-            © 2026 luvaai.in — Free forever.
-          </div>
-        </div>
-      </motion.footer>
+      <Footer />
     </div>
   );
 };

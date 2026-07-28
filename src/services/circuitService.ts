@@ -1,4 +1,4 @@
-import { collection, doc, setDoc, getDoc, getDocs, query, orderBy, limit, deleteDoc, serverTimestamp, Timestamp, updateDoc, increment } from 'firebase/firestore';
+import { collection, doc, setDoc, getDoc, getDocs, query, orderBy, limit, deleteDoc, serverTimestamp, Timestamp, updateDoc, increment, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import { ComponentData, WireData } from '../store';
 import { v4 as uuidv4 } from 'uuid';
@@ -141,7 +141,12 @@ export async function loadPublicCircuit(circuitId: string): Promise<{ components
 }
 
 export async function loadPublicGallery(limitCount = 20): Promise<GalleryItem[]> {
-  const q = query(collection(db, 'publicCircuits'), orderBy('createdAt', 'desc'), limit(limitCount));
+  const q = query(collection(db, 'publicCircuits'), where('reported', '!=', true), orderBy('createdAt', 'desc'), limit(limitCount));
   const snapshot = await getDocs(q);
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as GalleryItem));
+}
+
+export async function reportCircuit(id: string): Promise<void> {
+  const ref = doc(db, 'publicCircuits', id);
+  await updateDoc(ref, { reported: true });
 }

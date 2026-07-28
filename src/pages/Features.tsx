@@ -4,35 +4,23 @@ import { Download, Lightbulb, Terminal, Cpu, Activity, Layers, Play, Settings } 
 import { motion } from 'motion/react';
 import { Helmet } from 'react-helmet-async';
 import { ParticlesBackground } from '../components/ParticlesBackground';
+import { Navigation } from '../components/Navigation';
+import { Footer } from '../components/Footer';
 
 export const Features = () => {
   return (
-    <div className="min-h-screen relative bg-[#09090b] selection:bg-cyan-500/30 overflow-y-auto">
+    <div className="min-h-screen relative bg-[#09090b] selection:bg-cyan-500/30 overflow-y-auto flex flex-col">
       <div className="fixed inset-0 z-0 pointer-events-none w-full h-full">
         <ParticlesBackground />
       </div>
+      <Navigation />
       <Helmet>
         <title>Features | CircuitForge</title>
         <meta name="description" content="Discover the powerful features of CircuitForge - the free 3D circuit simulator." />
       </Helmet>
       
-      {/* HEADER */}
-      <motion.header 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 p-6 max-w-5xl mx-auto flex items-center justify-between"
-      >
-        <Link to="/" className="text-xl font-bold tracking-tight flex items-center gap-2">
-          <span className="text-white">Circuit</span>
-          <span className="text-cyan-400">⚡Forge</span>
-        </Link>
-        <Link to="/sim" className="px-5 py-2 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold rounded-lg text-sm transition-all shadow-[0_0_15px_rgba(34,211,238,0.3)]">
-          Open Simulator
-        </Link>
-      </motion.header>
-
       {/* CONTENT */}
-      <main className="relative z-10 max-w-5xl mx-auto px-6 py-12 md:py-20">
+      <main className="relative z-10 max-w-5xl mx-auto px-6 py-12 md:py-20 flex-1 w-full">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -97,16 +85,7 @@ export const Features = () => {
         </motion.div>
       </main>
       
-      {/* FOOTER */}
-      <footer className="relative z-10 border-t border-zinc-800 py-8 text-center text-zinc-500 text-sm">
-        <div className="max-w-5xl mx-auto px-6 flex justify-between items-center">
-          <p>© 2026 CircuitForge</p>
-          <div className="flex gap-4">
-            <Link to="/privacy" className="hover:text-cyan-400 transition-colors">Privacy</Link>
-            <Link to="/terms" className="hover:text-cyan-400 transition-colors">Terms</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
