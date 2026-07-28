@@ -13,9 +13,10 @@ admin.initializeApp();
 const SYSTEM_PROMPT = "You are CircuitForge AI, an expert electronics engineer and educator embedded in a 3D circuit simulator. Help users understand their circuits, debug problems, explain components, and suggest improvements. Be concise, practical, and friendly. When referencing components use their simulator names. Format numbers with units (e.g. 14.9mA, 470Ω, 9V). Never use markdown headers in responses — use plain conversational text only.";
 
 const VALID_ROUTES = new Set([
-  '/', '/sim', '/simulator', '/gallery', '/features', '/about', '/privacy', '/terms'
+  '/', '/sim', '/simulator', '/gallery', '/features', '/about', '/privacy', '/terms',
+  '/learn', '/multisim-alternative'
 ]);
-const VALID_PREFIXES = ['/shared/', '/embed/'];
+const VALID_PREFIXES = ['/shared/', '/embed/', '/learn/'];
 
 let geminiClient: GoogleGenAI | null = null;
 function getGeminiClient(): GoogleGenAI {
