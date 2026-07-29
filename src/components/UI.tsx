@@ -135,7 +135,7 @@ export const UI = () => {
     setIsSharing(true);
     try {
       const circuitId = await saveCircuit(user.uid, circuitName, components, wires);
-      const url = await shareCircuit(user.uid, circuitId);
+      const url = await shareCircuit(user.uid, circuitId, user.displayName || undefined);
       
       setShareResult({ url, circuitId });
       useCircuitStore.getState().showToast('Circuit shared! View details in the modal.', 'success');

@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import * as admin from 'firebase-admin';
@@ -69,8 +70,8 @@ async function startServer() {
   });
 
   const aiLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 20, // 20 requests per minute
+    windowMs: 60 * 1000,
+    max: 20,
     message: { error: 'Too many requests, please try again later.' }
   });
 
@@ -134,7 +135,6 @@ async function startServer() {
       appType: 'spa',
     });
     
-    // Set 410 status for unknown non-asset routes but let SPA handle rendering
     app.use((req, res, next) => {
       const isInternal = req.path.startsWith('/@') || req.path.startsWith('/src/') || req.path.startsWith('/node_modules/');
       const hasExt = /\.[a-zA-Z0-9]+$/.test(req.path);
@@ -150,8 +150,24 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath, { extensions: ['html'] }));
+
+    // Serve static assets (JS, CSS, images etc.)
+    app.use(express.static(distPath));
+
+    // For all page requests — check for pre-rendered HTML first,
+    // then fall back to index.html for the React SPA
     app.get('*all', (req, res) => {
+      const prerenderedFile = path.join(distPath, req.path + '.html');
+      const prerenderedIndex = path.join(distPath, req.path, 'index.html');
+
+      if (fs.existsSync(prerenderedFile)) {
+        return res.sendFile(prerenderedFile);
+      }
+
+      if (fs.existsSync(prerenderedIndex)) {
+        return res.sendFile(prerenderedIndex);
+      }
+
       const isSpa = VALID_ROUTES.has(req.path) || VALID_PREFIXES.some(p => req.path.startsWith(p));
       if (!isSpa) {
         res.status(410);

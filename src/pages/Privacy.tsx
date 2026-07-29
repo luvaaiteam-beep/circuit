@@ -17,6 +17,8 @@ export const Privacy = () => {
       <Helmet>
         <title>Privacy Policy | CircuitForge</title>
         <meta name="description" content="Privacy Policy for CircuitForge, explaining how we handle your data." />
+        <meta name="robots" content="noindex, follow" />
+        <link rel="canonical" href="https://luvaai.in/privacy" />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",

@@ -17,6 +17,8 @@ export const Terms = () => {
       <Helmet>
         <title>Terms of Service | CircuitForge</title>
         <meta name="description" content="Terms of Service for using CircuitForge." />
+        <meta name="robots" content="noindex, follow" />
+        <link rel="canonical" href="https://luvaai.in/terms" />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",

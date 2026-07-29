@@ -14,8 +14,19 @@ export const About = () => {
       </div>
       <Navigation />
       <Helmet>
-        <title>About | CircuitForge</title>
-        <meta name="description" content="Learn about the mission and development of CircuitForge." />
+        <title>About CircuitForge — Free 3D Browser Circuit Simulator | luvaai.in</title>
+        <meta name="description" content="CircuitForge is a free browser-based 3D circuit simulator built for students, educators, and electronics hobbyists. No download, no signup required." />
+        <meta name="keywords" content="about CircuitForge, free circuit simulator, browser circuit simulator, electronics learning tool, who made CircuitForge" />
+        <link rel="canonical" href="https://luvaai.in/about" />
+        <meta property="og:title" content="About CircuitForge — Free 3D Circuit Simulator" />
+        <meta property="og:description" content="CircuitForge is a free browser-based 3D circuit simulator built for students and educators. No download, no signup required." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://luvaai.in/about" />
+        <meta property="og:image" content="https://luvaai.in/og-image.jpg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="About CircuitForge — Free 3D Circuit Simulator" />
+        <meta name="twitter:description" content="Free browser-based 3D circuit simulator for students and educators. No download required." />
+        <meta name="twitter:image" content="https://luvaai.in/og-image.jpg" />
       </Helmet>
       
       <main className="relative z-10 max-w-3xl mx-auto px-6 py-12 md:py-20 text-zinc-300 flex-1 w-full">

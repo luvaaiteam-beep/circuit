@@ -24,6 +24,7 @@ export interface GalleryItem {
   createdAt: Timestamp;
   circuitId: string;
   views?: number;
+  displayName?: string;
 }
 
 function generateThumbnailDesc(components: ComponentData[]): string {
@@ -76,7 +77,7 @@ export async function deleteCircuit(uid: string, circuitId: string): Promise<voi
   await deleteDoc(doc(db, `publicCircuits/${circuitId}`));
 }
 
-export async function shareCircuit(uid: string, circuitId: string): Promise<string> {
+export async function shareCircuit(uid: string, circuitId: string, displayName?: string): Promise<string> {
   const circuitRef = doc(db, `users/${uid}/circuits/${circuitId}`);
   const circuitSnap = await getDoc(circuitRef);
   
@@ -97,7 +98,8 @@ export async function shareCircuit(uid: string, circuitId: string): Promise<stri
     thumbnailDesc: data.thumbnailDesc,
     createdAt: data.createdAt || serverTimestamp(),
     circuitId,
-    views: 0
+    views: 0,
+    displayName: displayName || 'Anonymous'
   });
   
   return `${window.location.origin}/shared/${circuitId}`;
@@ -140,6 +142,10 @@ export async function loadPublicCircuit(circuitId: string): Promise<{ components
   };
 }
 
+// IMPORTANT: This query requires a composite index in Firestore.
+// Go to Firebase Console → Firestore → Indexes → Composite and create:
+// Collection: publicCircuits | reported: Ascending | createdAt: Descending
+// Or click the link in the browser console error when this query fails.
 export async function loadPublicGallery(limitCount = 20): Promise<GalleryItem[]> {
   const q = query(collection(db, 'publicCircuits'), where('reported', '!=', true), orderBy('createdAt', 'desc'), limit(limitCount));
   const snapshot = await getDocs(q);

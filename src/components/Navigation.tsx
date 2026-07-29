@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { useAuth } from '../hooks/useAuth';
+import { LogOut, User } from 'lucide-react';
 
 export const Navigation = () => {
-  const { user, loading, signInWithGoogle } = useAuth();
+  const { user, loading, signInWithGoogle, signOut } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <motion.nav 
@@ -27,9 +30,45 @@ export const Navigation = () => {
       <div className="flex items-center gap-4">
         {!loading && (
           user ? (
-            <div className="flex items-center gap-3">
-              <span className="hidden md:inline-block text-sm text-zinc-400">{user.displayName}</span>
-              <img src={user.photoURL || ''} alt="Profile" className="w-8 h-8 rounded-full border border-zinc-800" />
+            <div className="relative">
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="flex items-center gap-3 focus:outline-none"
+              >
+                <span className="hidden md:inline-block text-sm text-zinc-400">
+                  {user.displayName}
+                </span>
+                <img
+                  src={user.photoURL || ''}
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full border border-zinc-700 hover:border-cyan-500 transition-colors cursor-pointer"
+                />
+              </button>
+
+              {menuOpen && (
+                <>
+                  {/* backdrop to close on outside click */}
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setMenuOpen(false)}
+                  />
+                  <div className="absolute right-0 top-12 z-50 w-48 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl overflow-hidden">
+                    <div className="px-4 py-3 border-b border-zinc-800">
+                      <p className="text-sm font-medium text-white truncate">
+                        {user.displayName}
+                      </p>
+                      <p className="text-xs text-zinc-500 truncate">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={() => { signOut(); setMenuOpen(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+                    >
+                      <LogOut size={16} />
+                      Sign out
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             <button 

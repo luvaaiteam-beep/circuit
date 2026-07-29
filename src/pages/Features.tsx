@@ -15,8 +15,19 @@ export const Features = () => {
       </div>
       <Navigation />
       <Helmet>
-        <title>Features | CircuitForge</title>
-        <meta name="description" content="Discover the powerful features of CircuitForge - the free 3D circuit simulator." />
+        <title>Features — 3D Simulation, AI Assistant, 22 Components | CircuitForge</title>
+        <meta name="description" content="CircuitForge features: true 3D circuit visualization, real MNA physics solver, 22 electronic components, built-in AI assistant, save and share circuits. Free, no download." />
+        <meta name="keywords" content="circuit simulator features, 3D circuit simulator, online circuit simulator AI, free electronics simulator, MNA solver, circuit simulator components" />
+        <link rel="canonical" href="https://luvaai.in/features" />
+        <meta property="og:title" content="CircuitForge Features — 3D Simulation, AI Assistant & More" />
+        <meta property="og:description" content="True 3D visualization, real MNA physics, 22 components, built-in AI assistant. The most advanced free browser circuit simulator available." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://luvaai.in/features" />
+        <meta property="og:image" content="https://luvaai.in/og-image.jpg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="CircuitForge Features — 3D Simulation & AI Assistant" />
+        <meta name="twitter:description" content="True 3D visualization, real MNA physics, 22 components, built-in AI. Free, no download." />
+        <meta name="twitter:image" content="https://luvaai.in/og-image.jpg" />
       </Helmet>
       
       {/* CONTENT */}

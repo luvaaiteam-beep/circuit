@@ -1,7 +1,8 @@
 User-agent: *
+Allow: /
 Allow: /simulator
 Allow: /multisim-alternative
-Allow: /
+Allow: /learn
 Disallow: /sim
 
 Sitemap: https://luvaai.in/sitemap.xml

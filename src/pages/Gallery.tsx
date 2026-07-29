@@ -93,8 +93,19 @@ export const Gallery = () => {
       </div>
       <Navigation />
       <Helmet>
-        <title>Community Gallery | CircuitForge</title>
-        <meta name="description" content="Explore and load electronic circuits built by the CircuitForge community." />
+        <title>Community Circuit Gallery — Browse & Share Circuits | CircuitForge</title>
+        <meta name="description" content="Browse circuits built and shared by the CircuitForge community. Load any circuit directly into the 3D simulator. Share your own circuits with one click." />
+        <meta name="keywords" content="circuit gallery, shared circuits, electronic circuit examples, circuit simulator community, free circuit designs" />
+        <link rel="canonical" href="https://luvaai.in/gallery" />
+        <meta property="og:title" content="Community Circuit Gallery | CircuitForge" />
+        <meta property="og:description" content="Browse and load circuits built by the CircuitForge community. Share your own circuits with one click." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://luvaai.in/gallery" />
+        <meta property="og:image" content="https://luvaai.in/og-image.jpg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Community Circuit Gallery | CircuitForge" />
+        <meta name="twitter:description" content="Browse and load circuits built by the CircuitForge community. Free, no signup to view." />
+        <meta name="twitter:image" content="https://luvaai.in/og-image.jpg" />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
@@ -102,7 +113,7 @@ export const Gallery = () => {
             "itemListElement": publicCircuits.map((c, i) => ({
               "@type": "ListItem",
               "position": i + 1,
-              "url": `https://ais-pre-4mzi7p37dmylle7dbs5wpa-568632231557.asia-southeast1.run.app/shared/${c.circuitId}`,
+              "url": `https://luvaai.in/shared/${c.circuitId}`,
               "name": c.name || 'Untitled Circuit'
             }))
           })}
@@ -112,18 +123,8 @@ export const Gallery = () => {
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             "itemListElement": [
-              {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Home",
-                "item": "https://ais-pre-4mzi7p37dmylle7dbs5wpa-568632231557.asia-southeast1.run.app/"
-              },
-              {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Gallery",
-                "item": "https://ais-pre-4mzi7p37dmylle7dbs5wpa-568632231557.asia-southeast1.run.app/gallery"
-              }
+              { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://luvaai.in" },
+              { "@type": "ListItem", "position": 2, "name": "Gallery", "item": "https://luvaai.in/gallery" }
             ]
           })}
         </script>
@@ -224,7 +225,7 @@ export const Gallery = () => {
                   </p>
                   <div className="flex items-center justify-between mt-auto pt-4 border-t border-zinc-800/50 relative z-10">
                     <div className="text-xs text-zinc-600 flex items-center gap-2">
-                      <span>Shared by <span className="text-zinc-400">User</span></span>
+                      <span>Shared by <span className="text-zinc-400">{circuit.displayName || 'Anonymous'}</span></span>
                       {circuit.views !== undefined && (
                         <span className="bg-zinc-800/80 px-1.5 py-0.5 rounded-md text-cyan-400 flex items-center gap-1 font-mono text-[9px]">
                            👁 {circuit.views} 
