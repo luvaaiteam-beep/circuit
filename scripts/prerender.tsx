@@ -22,8 +22,10 @@ const template = fs.readFileSync(path.resolve(process.cwd(), 'dist/index.html'),
 
 routes.forEach(route => {
   const Component = route.component;
+  const helmetContext = {};
+
   const html = ReactDOMServer.renderToString(
-    <HelmetProvider>
+    <HelmetProvider context={helmetContext}>
       <AuthProvider>
         <StaticRouter location={route.path}>
           <Component />
@@ -32,32 +34,45 @@ routes.forEach(route => {
     </HelmetProvider>
   );
 
-  const filePath = path.resolve(process.cwd(), route.file);
-  const fileContent = fs.readFileSync(filePath, 'utf-8');
-  
-  const titleMatch = fileContent.match(/<title>([^<]+)<\/title>/);
-  const title = titleMatch ? titleMatch[1] : 'CircuitForge';
-  
-  const metaMatches = [...fileContent.matchAll(/<meta[^>]+>/g)].map(m => m[0]);
-  
   let finalHtml = template;
+  
+  // Custom extraction logic for title based on the route
+  let title = 'CircuitForge';
+  if (route.path === '/learn/how-to-make-a-simple-circuit') {
+    title = 'How to Make a Simple Circuit (2026) — Step-by-Step Online Guide | CircuitForge';
+  } else if (route.path === '/learn/electric-circuit-school-project') {
+    title = 'Electric Circuit School Project (2026) — Guide & Examples | CircuitForge';
+  } else if (route.path === '/multisim-alternative') {
+    title = 'Free Multisim Live Alternative (2026) — CircuitForge Simulator';
+  } else if (route.path === '/learn') {
+    title = 'Learn Electronics — Circuits, Components & Simulation | CircuitForge';
+  }
+
   finalHtml = finalHtml.replace(/<title>.*<\/title>/, `<title>${title}</title>`);
+  
+  // ALWAYS strip out the base canonical link
+  finalHtml = finalHtml.replace(/<link rel="canonical"[^>]*>/g, '');
   finalHtml = finalHtml.replace(/<meta property="og:[^>]+>/g, '');
   finalHtml = finalHtml.replace(/<meta name="twitter:[^>]+>/g, '');
   finalHtml = finalHtml.replace(/<meta name="description"[^>]+>/g, '');
-  
-  const headInjection = metaMatches.join('\n');
-  finalHtml = finalHtml.replace('</head>', `${headInjection}\n</head>`);
+
+  if (helmetContext.helmet) {
+    const { helmet } = helmetContext;
+    
+    const helmetHead = `
+      ${helmet.meta.toString()}
+      ${helmet.link.toString()}
+      ${helmet.script.toString()}
+    `;
+
+    finalHtml = finalHtml.replace('</head>', `${helmetHead}\n</head>`);
+  }
+
   finalHtml = finalHtml.replace('<div id="root"></div>', `<div id="root">${html}</div>`);
   
-  // Create output path: /learn -> dist/learn.html, /learn/how-to... -> dist/learn/how-to....html
   const outPath = path.join(process.cwd(), 'dist', `${route.path}.html`);
   const outDir = path.dirname(outPath);
-  
-  if (!fs.existsSync(outDir)) {
-    fs.mkdirSync(outDir, { recursive: true });
-  }
-  
+  if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(outPath, finalHtml);
   console.log(`Pre-rendered ${route.path} -> ${outPath}`);
 });

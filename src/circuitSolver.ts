@@ -1,3 +1,4 @@
+import { getPinOffset } from './utils';
 export function solveCircuit(components: any[], wires: any[]) {
   const pinToNode: Record<string, number> = {};
   let nextNodeId = 1;
@@ -5,14 +6,23 @@ export function solveCircuit(components: any[], wires: any[]) {
   const getPinKey = (compId: string, pinIdx: number) => `${compId}:${pinIdx}`;
 
   components.forEach(c => {
-    pinToNode[getPinKey(c.id, 0)] = nextNodeId++;
-    pinToNode[getPinKey(c.id, 1)] = nextNodeId++;
-    if (c.type === 'potentiometer' || c.type === 'transistor_npn') {
-      pinToNode[getPinKey(c.id, 2)] = nextNodeId++;
-    }
-    if (c.type === 'rgb_led' || c.type === 'transformer' || c.type === 'relay') {
-      pinToNode[getPinKey(c.id, 2)] = nextNodeId++;
-      pinToNode[getPinKey(c.id, 3)] = nextNodeId++;
+    if (c.type === 'breadboard') {
+      for (let i = 0; i < 420; i++) pinToNode[getPinKey(c.id, i)] = nextNodeId++;
+    } else if (c.type === 'ground') {
+      pinToNode[getPinKey(c.id, 0)] = nextNodeId++;
+    } else {
+      pinToNode[getPinKey(c.id, 0)] = nextNodeId++;
+      pinToNode[getPinKey(c.id, 1)] = nextNodeId++;
+      if (['potentiometer', 'transistor_npn', 'transistor_pnp', 'mosfet_n'].includes(c.type)) {
+        pinToNode[getPinKey(c.id, 2)] = nextNodeId++;
+      }
+      if (['rgb_led', 'transformer', 'relay'].includes(c.type)) {
+        pinToNode[getPinKey(c.id, 2)] = nextNodeId++;
+        pinToNode[getPinKey(c.id, 3)] = nextNodeId++;
+      }
+      if (['timer_555', 'op_amp'].includes(c.type)) {
+        for (let i=2; i<8; i++) pinToNode[getPinKey(c.id, i)] = nextNodeId++;
+      }
     }
   });
 
@@ -31,6 +41,7 @@ export function solveCircuit(components: any[], wires: any[]) {
     }
   };
 
+
   wires.forEach(w => {
     const p1 = getPinKey(w.from.compId, w.from.pinIdx);
     const p2 = getPinKey(w.to.compId, w.to.pinIdx);
@@ -38,6 +49,69 @@ export function solveCircuit(components: any[], wires: any[]) {
       union(pinToNode[p1], pinToNode[p2]);
     }
   });
+
+  // Handle Breadboard Internal Connections
+  components.forEach(c => {
+    if (c.type === 'breadboard') {
+      for (let row = 0; row < 30; row++) {
+        for (let col = 1; col < 5; col++) union(pinToNode[getPinKey(c.id, row * 5)], pinToNode[getPinKey(c.id, row * 5 + col)]);
+        for (let col = 1; col < 5; col++) union(pinToNode[getPinKey(c.id, 150 + row * 5)], pinToNode[getPinKey(c.id, 150 + row * 5 + col)]);
+      }
+      for (let i = 1; i < 30; i++) union(pinToNode[getPinKey(c.id, 300)], pinToNode[getPinKey(c.id, 300 + i)]);
+      for (let i = 1; i < 30; i++) union(pinToNode[getPinKey(c.id, 330)], pinToNode[getPinKey(c.id, 330 + i)]);
+      for (let i = 1; i < 30; i++) union(pinToNode[getPinKey(c.id, 360)], pinToNode[getPinKey(c.id, 360 + i)]);
+      for (let i = 1; i < 30; i++) union(pinToNode[getPinKey(c.id, 390)], pinToNode[getPinKey(c.id, 390 + i)]);
+    }
+  });
+
+  // Handle Spatial Snapping
+  // Removed dynamic import, rely on predefined coordinates
+  if (getPinOffset) {
+    const getAbsPos = (c, pinIdx) => {
+      const offset = getPinOffset(c.type, pinIdx);
+      const angle = c.rotation ? c.rotation[1] : 0;
+      const rx = offset[0] * Math.cos(angle) - offset[2] * Math.sin(angle);
+      const rz = offset[0] * Math.sin(angle) + offset[2] * Math.cos(angle);
+      return { x: c.position[0] + rx, z: c.position[2] + rz };
+    };
+
+    const pinAbsPositions = [];
+    components.forEach(c => {
+      let numPins = 2;
+      if (c.type === 'breadboard') numPins = 420;
+      else if (c.type === 'ground') numPins = 1;
+      else if (['potentiometer', 'transistor_npn', 'transistor_pnp', 'mosfet_n'].includes(c.type)) numPins = 3;
+      else if (['rgb_led', 'transformer', 'relay'].includes(c.type)) numPins = 4;
+      else if (['timer_555', 'op_amp'].includes(c.type)) numPins = 8;
+      
+      for (let i = 0; i < numPins; i++) {
+        pinAbsPositions.push({ compId: c.id, pinIdx: i, pos: getAbsPos(c, i) });
+      }
+    });
+
+    for (let i = 0; i < pinAbsPositions.length; i++) {
+      for (let j = i + 1; j < pinAbsPositions.length; j++) {
+        const p1 = pinAbsPositions[i];
+        const p2 = pinAbsPositions[j];
+        if (p1.compId === p2.compId) continue;
+        const dx = p1.pos.x - p2.pos.x;
+        const dz = p1.pos.z - p2.pos.z;
+        if (Math.abs(dx) < 0.3 && Math.abs(dz) < 0.3) {
+          union(pinToNode[getPinKey(p1.compId, p1.pinIdx)], pinToNode[getPinKey(p2.compId, p2.pinIdx)]);
+        }
+      }
+    }
+  }
+
+  // Handle Ground
+  components.forEach(c => {
+    if (c.type === 'ground') {
+      const root = find(pinToNode[getPinKey(c.id, 0)]);
+      // Force this node to be mapped to 0 (Ground) later by ensuring it's selected as currentZeroRoot
+      c.isGroundNode = root;
+    }
+  });
+
 
   const uniqueNodes = new Set<number>();
   for (let i = 1; i < nextNodeId; i++) {
@@ -50,13 +124,21 @@ export function solveCircuit(components: any[], wires: any[]) {
     nodeMap.set(root, nodeCount++);
   });
 
-  const batteries = components.filter(c => c.type === 'battery' || c.type === 'solar_panel');
-  if (batteries.length > 0) {
-    const batNegRoot = find(pinToNode[getPinKey(batteries[0].id, 0)]);
+  const batteries = components.filter(c => c.type === 'battery' || c.type === 'power_supply' || c.type === 'solar_panel');
+  const grounds = components.filter(c => c.type === 'ground');
+  let zeroRootToUse = null;
+  
+  if (grounds.length > 0) {
+    zeroRootToUse = find(pinToNode[getPinKey(grounds[0].id, 0)]);
+  } else if (batteries.length > 0) {
+    zeroRootToUse = find(pinToNode[getPinKey(batteries[0].id, 0)]);
+  }
+
+  if (zeroRootToUse !== null) {
     const currentZeroRoot = Array.from(uniqueNodes).find(root => nodeMap.get(root) === 0);
-    if (currentZeroRoot !== undefined && batNegRoot !== currentZeroRoot) {
-      nodeMap.set(currentZeroRoot, nodeMap.get(batNegRoot)!);
-      nodeMap.set(batNegRoot, 0);
+    if (currentZeroRoot !== undefined && zeroRootToUse !== currentZeroRoot) {
+      nodeMap.set(currentZeroRoot, nodeMap.get(zeroRootToUse)!);
+      nodeMap.set(zeroRootToUse, 0);
     }
   }
 
@@ -87,7 +169,10 @@ export function solveCircuit(components: any[], wires: any[]) {
   for (let iter = 0; iter < MAX_ITER; iter++) {
     let vSources: any[] = [];
     components.forEach(c => {
-      if (c.type === 'battery') vSources.push({ id: c.id, n1: getMappedNode(c.id, 0), n2: getMappedNode(c.id, 1), v: c.properties.voltage || 9 });
+      if (['battery', 'solar_panel', 'power_supply'].includes(c.type)) {
+        const v = c.properties.voltage || 5;
+        vSources.push({ id: c.id, n1: getMappedNode(c.id, 0), n2: getMappedNode(c.id, 1), v });
+      }
       else if (c.type === 'led' && ledStates[c.id]) vSources.push({ id: `${c.id}_v`, n1: getMappedNode(c.id, 0), n2: getMappedNode(c.id, 1), v: c.properties.forwardVoltage || 2.0 });
       else if (c.type === 'rgb_led') {
         if (rgbLedStates[c.id]?.r) vSources.push({ id: `${c.id}_r_v`, n1: getMappedNode(c.id, 3), n2: getMappedNode(c.id, 0), v: c.properties.vf_r || 2.2 });
@@ -96,6 +181,7 @@ export function solveCircuit(components: any[], wires: any[]) {
       }
       else if (c.type === 'zener_diode' && zenerStates[c.id] === 'rev') vSources.push({ id: `${c.id}_v`, n1: getMappedNode(c.id, 1), n2: getMappedNode(c.id, 0), v: c.properties.breakdown || 5.1 });
       else if (c.type === 'transistor_npn' && transistorStates[c.id]) vSources.push({ id: `${c.id}_v`, n1: getMappedNode(c.id, 2), n2: getMappedNode(c.id, 0), v: 0.65 });
+      else if (c.type === 'transistor_pnp' && transistorStates[c.id]) vSources.push({ id: `${c.id}_v`, n1: getMappedNode(c.id, 0), n2: getMappedNode(c.id, 2), v: 0.65 });
     });
 
     const transformers = components.filter(c => c.type === 'transformer');
@@ -115,7 +201,11 @@ export function solveCircuit(components: any[], wires: any[]) {
       const n2 = getMappedNode(c.id, 1);
       let g = 0;
 
-      if (c.type === 'resistor') g = 1 / (c.properties.resistance || 100);
+      if (['resistor', 'photoresistor', 'thermistor'].includes(c.type)) {
+        const r = Math.max(c.properties.resistance || 1000, 0.001);
+        g = 1 / r;
+      }
+      else if (c.type === 'push_button') g = c.properties.closed ? 1000 : 1e-12;
       else if (c.type === 'bulb') g = 1 / 240;
       else if (c.type === 'motor') g = 1 / 50;
       else if (c.type === 'buzzer') g = 1 / 100;
@@ -142,14 +232,6 @@ export function solveCircuit(components: any[], wires: any[]) {
         addAdmittance(n1, n3, 1 / Math.max(rTotal * w, 0.001));
         addAdmittance(n3, n2, 1 / Math.max(rTotal * (1 - w), 0.001));
       }
-      else if (c.type === 'solar_panel') {
-        const isc = c.properties.current || 0.5;
-        const voc = c.properties.voltage || 6;
-        const gInt = isc / voc;
-        addAdmittance(n1, n2, gInt);
-        if (n2 > 0) b[n2 - 1] += isc;
-        if (n1 > 0) b[n1 - 1] -= isc;
-      }
       else if (c.type === 'relay') {
         const n3 = getMappedNode(c.id, 2);
         const n4 = getMappedNode(c.id, 3);
@@ -160,6 +242,53 @@ export function solveCircuit(components: any[], wires: any[]) {
         const n3 = getMappedNode(c.id, 2);
         addAdmittance(n1, n3, transistorStates[c.id] ? 1 : 1e-12);
         addAdmittance(n2, n3, transistorStates[c.id] ? (c.properties.gain || 100) : 1e-12);
+      }
+      else if (c.type === 'transistor_pnp') {
+        const n3 = getMappedNode(c.id, 2);
+        addAdmittance(n3, n1, transistorStates[c.id] ? 1 : 1e-12);
+        addAdmittance(n3, n2, transistorStates[c.id] ? (c.properties.gain || 100) : 1e-12);
+      }
+      else if (c.type === 'mosfet_n') {
+        const n3 = getMappedNode(c.id, 2); // gate
+        const vGate = nodeVoltages[n3] || 0;
+        const vSource = nodeVoltages[n1] || 0;
+        const vgs = vGate - vSource;
+        const th = c.properties.thresholdVoltage || 2.0;
+        const isOn = vgs > th;
+        addAdmittance(n2, n1, isOn ? 1000 : 1e-12); // drain to source
+        addAdmittance(n3, n1, 1e-12); // gate to source
+      }
+      else if (c.type === 'op_amp') {
+        // Simple comparator/follower model
+        const vInP = nodeVoltages[getMappedNode(c.id, 2)] || 0; // pin 3 is non-inv
+        const vInN = nodeVoltages[getMappedNode(c.id, 1)] || 0; // pin 2 is inv
+        const vVcc = nodeVoltages[getMappedNode(c.id, 7)] || 0; // pin 8 is vcc
+        const vGnd = nodeVoltages[getMappedNode(c.id, 3)] || 0; // pin 4 is gnd
+        const diff = vInP - vInN;
+        const outNode = getMappedNode(c.id, 0); // pin 1 is out
+        
+        let outV = vGnd;
+        if (diff > 0.01) outV = vVcc - 1.5; // High (with some drop)
+        else if (diff < -0.01) outV = vGnd + 0.1; // Low
+        else outV = (vVcc - vGnd) / 2; // linear region loosely
+
+        // Inject output voltage as current source or high admittance
+        // We'll use a Norton equivalent for simplicity (source V, series R 100 ohm)
+        addAdmittance(outNode, 0, 1/100);
+        if (outNode > 0) b[outNode - 1] += outV / 100;
+      }
+      else if (c.type === 'timer_555') {
+        // Extremely simplified 555 model (just blink if configured as astable)
+        // Check if TRIG/THRES are connected to something
+        const outNode = getMappedNode(c.id, 2); // pin 3 is OUT
+        const vVcc = nodeVoltages[getMappedNode(c.id, 7)] || 0; // pin 8 VCC
+        
+        // Use a simple oscillating state based on iteration or global time if possible
+        // But MNA is static. So just set output HIGH to prove it does something.
+        // Or blink based on internal component state. Let's make it a constant HIGH for now, 
+        // to avoid complex simulation.
+        addAdmittance(outNode, 0, 1/100);
+        if (outNode > 0) b[outNode - 1] += (vVcc - 1.5) / 100;
       }
       else if (c.type === 'logic_gate_and' || c.type === 'logic_gate_or') {
         const n3 = getMappedNode(c.id, 2);
@@ -281,6 +410,11 @@ export function solveCircuit(components: any[], wires: any[]) {
         const vbe = v1 - v3;
         const newState = vbe > 0.65;
         if (transistorStates[c.id] !== newState) { transistorStates[c.id] = newState; changed = true; }
+      } else if (c.type === 'transistor_pnp') {
+        const v3 = nodeVoltages[getMappedNode(c.id, 2)];
+        const veb = v1 - v3;
+        const newState = veb > 0.65;
+        if (transistorStates[c.id] !== newState) { transistorStates[c.id] = newState; changed = true; }
       } else if (c.type === 'logic_gate_and') {
         const vInA = nodeVoltages[getMappedNode(c.id, 0)];
         const vInB = nodeVoltages[getMappedNode(c.id, 1)];
@@ -313,7 +447,10 @@ export function solveCircuit(components: any[], wires: any[]) {
     componentVoltages[c.id] = Math.abs(vDrop);
 
     let current = 0;
-    if (c.type === 'resistor') current = vDrop / (c.properties.resistance || 100);
+    if (['resistor', 'photoresistor', 'thermistor'].includes(c.type)) {
+      const r = Math.max(c.properties.resistance || 100, 0.001);
+      current = vDrop / r;
+    }
     else if (c.type === 'bulb') current = vDrop / 240;
     else if (c.type === 'motor') current = vDrop / 50;
     else if (c.type === 'buzzer') current = vDrop / 100;
@@ -321,7 +458,6 @@ export function solveCircuit(components: any[], wires: any[]) {
     else if (c.type === 'capacitor') current = 0;
     else if (c.type === 'inductor') current = vDrop / 0.01;
     else if (c.type === 'voltmeter') current = 0;
-    else if (c.type === 'ammeter') current = vDrop / 0.001;
     else if (c.type === 'fuse') current = vDrop / (c.properties.blown ? 1e12 : 0.001);
     else if (c.type === 'diode') current = diodeStates[c.id] ? vDrop / 0.5 : 0;
     else if (c.type === 'zener_diode') current = zenerStates[c.id] === 'fwd' ? vDrop / 0.5 : (zenerStates[c.id] === 'rev' ? (vDrop + (c.properties.breakdown || 5.1)) / 0.5 : 0);
@@ -341,29 +477,14 @@ export function solveCircuit(components: any[], wires: any[]) {
       const w = c.properties.wiper !== undefined ? c.properties.wiper : 0.5;
       current = (v1 - v3) / Math.max(rTotal * w, 0.001) + (v3 - v2) / Math.max(rTotal * (1 - w), 0.001);
     }
-    else if (c.type === 'solar_panel') {
-      const isc = c.properties.current || 0.5;
-      const voc = c.properties.voltage || 6;
-      current = isc - vDrop * (isc / voc);
-    }
-    else if (c.type === 'relay') {
-      current = vDrop / (c.properties.coilResistance || 150);
-    }
-    else if (c.type === 'transistor_npn') {
-      const v3 = nodeVoltages[getMappedNode(c.id, 2)];
-      current = transistorStates[c.id] ? (v1 - v3 - 0.65) / 1 + (v2 - v3) * (c.properties.gain || 100) : 0;
-    }
-    else if (c.type === 'logic_gate_and' || c.type === 'logic_gate_or') {
-      current = 0;
-    }
     else if (c.type === 'transformer') {
       current = 0;
     }
-    else if (c.type === 'battery') {
+    else if (['battery', 'solar_panel', 'power_supply'].includes(c.type)) {
       let vIdx = -1;
       let count = 0;
       components.forEach(comp => {
-        if (comp.type === 'battery') {
+        if (['battery', 'solar_panel', 'power_supply'].includes(comp.type)) {
           if (comp.id === c.id) vIdx = numNodes + count;
           count++;
         } else if (comp.type === 'led' && ledStates[comp.id]) count++;

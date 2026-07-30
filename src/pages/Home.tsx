@@ -76,7 +76,7 @@ export const Home = () => {
             in your browser.
           </h1>
           <p className="text-lg md:text-xl text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Build real circuits with 22 components. Powered by nodal analysis physics. No download. No account required to start.
+            Build real circuits with components. Powered by nodal analysis physics. No download. No account required to start.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/sim" className="px-8 py-4 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold rounded-lg text-lg transition-all shadow-[0_0_30px_rgba(34,211,238,0.4)] flex items-center gap-2">
@@ -97,7 +97,7 @@ export const Home = () => {
         className="bg-zinc-900 relative z-10 border-y border-zinc-800 py-6"
       >
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-around items-center gap-6 text-zinc-400 font-mono text-sm tracking-widest uppercase">
-          <div className="flex items-center gap-2"><Layers size={18} className="text-cyan-500" /> 22 Components</div>
+          <div className="flex items-center gap-2"><Layers size={18} className="text-cyan-500" /> Components</div>
           <div className="hidden md:block w-1 h-1 rounded-full bg-zinc-700"></div>
           <div className="flex items-center gap-2"><Activity size={18} className="text-emerald-500" /> Real MNA Physics</div>
           <div className="hidden md:block w-1 h-1 rounded-full bg-zinc-700"></div>
@@ -120,7 +120,7 @@ export const Home = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <FeatureCard index={0} icon={<Layers className="text-cyan-400" size={24} />} title="True 3D" desc="Orbit, zoom, and drag components on a real 3D workbench. Every component is a detailed 3D model — not a flat schematic symbol." />
           <FeatureCard index={1} icon={<Activity className="text-emerald-400" size={24} />} title="Real physics engine" desc="Modified Nodal Analysis (MNA) solver — the same method used by SPICE. Parallel paths, voltage dividers, and multi-source circuits all solved correctly." />
-          <FeatureCard index={2} icon={<Cpu className="text-amber-400" size={24} />} title="22 components" desc="From basics like resistors and LEDs to transistors, logic gates, relays, and RGB LEDs. Every component has accurate DC simulation behavior." />
+          <FeatureCard index={2} icon={<Cpu className="text-amber-400" size={24} />} title="Components" desc="From basics like resistors and LEDs to transistors, logic gates, relays, and RGB LEDs. Every component has accurate DC simulation behavior." />
           <FeatureCard index={3} icon={<Terminal className="text-purple-400" size={24} />} title="AI circuit assistant" desc="Ask CircuitForge AI why your LED isn't lighting up. Powered by Gemini — responses stream back fast and smart." />
           <FeatureCard index={4} icon={<Download className="text-blue-400" size={24} />} title="Save & share" desc="Sign in with Google to save unlimited circuits. Share any circuit with a public link — one click, anyone can load and explore it." />
           <FeatureCard index={5} icon={<Lightbulb className="text-yellow-400" size={24} />} title="15 starter templates" desc="Load a working circuit instantly: LED + resistor, voltage divider, H-bridge, transistor switch, logic gates, and more." />
@@ -170,7 +170,7 @@ export const Home = () => {
         viewport={{ once: true }}
         className="py-24 px-6 relative z-10 max-w-5xl mx-auto text-center"
       >
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-12">22 components and counting</h2>
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-12">Components and counting</h2>
         <div className="flex flex-wrap justify-center gap-3">
           <CompChip icon={<Battery size={16} />} name="Battery" color="text-emerald-400" />
           <CompChip icon={<Activity size={16} />} name="Resistor" color="text-amber-400" />

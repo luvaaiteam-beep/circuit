@@ -81,7 +81,7 @@ export const Simulator = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 { icon: <Cpu />, title: "MNA Physics Solver", desc: "Real-time Modified Nodal Analysis engine processes complex circuits, calculating voltage and current dynamically." },
-                { icon: <Layers />, title: "22+ Components", desc: "From simple resistors and batteries to logic gates, relays, transistors, and motors." },
+                { icon: <Layers />, title: "Comprehensive Components", desc: "From simple resistors and batteries to logic gates, relays, transistors, and motors." },
                 { icon: <Zap />, title: "AI Circuit Assistant", desc: "Stuck? Ask the integrated AI assistant to analyze your circuit, explain concepts, or fix wiring errors." },
                 { icon: <Share2 />, title: "Save & Share", desc: "Save your circuits to the cloud, share private links, or publish to the community gallery instantly." }
               ].map((feature, i) => (
@@ -104,7 +104,7 @@ export const Simulator = () => {
             <div>
               <div className="w-16 h-16 bg-zinc-900 border border-zinc-800 text-cyan-400 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">1</div>
               <h3 className="text-xl font-semibold text-zinc-200 mb-3">Place Components</h3>
-              <p className="text-zinc-400">Select from over 22 available electronic parts and drop them onto your 3D grid.</p>
+              <p className="text-zinc-400">Select from available electronic parts and drop them onto your 3D grid.</p>
             </div>
             <div>
               <div className="w-16 h-16 bg-zinc-900 border border-zinc-800 text-cyan-400 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">2</div>

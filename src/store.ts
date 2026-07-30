@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { v4 as uuidv4 } from 'uuid';
 import { solveCircuit } from './circuitSolver';
 
-export type ComponentType = 'battery' | 'resistor' | 'led' | 'switch' | 'capacitor' | 'bulb' | 'diode' | 'inductor' | 'motor' | 'buzzer' | 'voltmeter' | 'ammeter' | 'potentiometer' | 'transistor_npn' | 'transformer' | 'fuse' | 'solar_panel' | 'logic_gate_and' | 'logic_gate_or' | 'rgb_led' | 'zener_diode' | 'relay';
+export type ComponentType = 'battery' | 'resistor' | 'led' | 'switch' | 'capacitor' | 'bulb' | 'diode' | 'inductor' | 'motor' | 'buzzer' | 'voltmeter' | 'ammeter' | 'potentiometer' | 'transistor_npn' | 'transformer' | 'fuse' | 'solar_panel' | 'logic_gate_and' | 'logic_gate_or' | 'rgb_led' | 'zener_diode' | 'relay' | 'breadboard' | 'ground' | 'push_button' | 'transistor_pnp' | 'mosfet_n' | 'timer_555' | 'op_amp' | 'photoresistor' | 'thermistor' | 'power_supply';
 
 export interface LogEntry {
   id: string;
@@ -109,6 +109,16 @@ const getDefaultProps = (type: ComponentType) => {
     case 'rgb_led': return { vf_r: 2.2, vf_g: 3.3, vf_b: 3.2 };
     case 'zener_diode': return { breakdown: 5.1 };
     case 'relay': return { coilResistance: 150 };
+    case 'breadboard': return {};
+    case 'ground': return {};
+    case 'push_button': return { closed: false };
+    case 'transistor_pnp': return { gain: 100 };
+    case 'mosfet_n': return { thresholdVoltage: 2.0 };
+    case 'timer_555': return {};
+    case 'op_amp': return {};
+    case 'photoresistor': return { resistance: 10000, minResistance: 100 };
+    case 'thermistor': return { resistance: 10000, beta: 3950 };
+    case 'power_supply': return { voltage: 5, current: 1 };
     default: return {};
   }
 };

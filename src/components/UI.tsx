@@ -520,6 +520,18 @@ export const UI = () => {
               { type: 'buzzer', category: 'Output', icon: Volume2, color: 'text-fuchsia-400', border: 'border-fuchsia-400/30', bg: 'bg-fuchsia-400/10', label: 'Buzzer', desc: 'Piezo 440Hz' },
               { type: 'voltmeter', category: 'Meters', icon: Activity, color: 'text-cyan-500', border: 'border-cyan-500/30', bg: 'bg-cyan-500/10', label: 'Voltmeter', desc: 'Measures Voltage' },
               { type: 'ammeter', category: 'Meters', icon: Activity, color: 'text-orange-500', border: 'border-orange-500/30', bg: 'bg-orange-500/10', label: 'Ammeter', desc: 'Measures Current' },
+
+              { type: 'breadboard', category: 'Passive', icon: Grid, color: 'text-zinc-300', border: 'border-zinc-300/30', bg: 'bg-zinc-300/10', label: 'Breadboard', desc: 'Solderless Board' },
+              { type: 'ground', category: 'Sources', icon: ArrowRightToLine, color: 'text-green-500', border: 'border-green-500/30', bg: 'bg-green-500/10', label: 'Ground', desc: '0V Reference' },
+              { type: 'push_button', category: 'Active', icon: ToggleLeft, color: 'text-emerald-400', border: 'border-emerald-400/30', bg: 'bg-emerald-400/10', label: 'Push Button', desc: 'Momentary Switch' },
+              { type: 'transistor_pnp', category: 'Active', icon: Cpu, color: 'text-gray-400', border: 'border-gray-400/30', bg: 'bg-gray-400/10', label: 'PNP Transistor', desc: 'BJT PNP' },
+              { type: 'mosfet_n', category: 'Active', icon: Cpu, color: 'text-gray-400', border: 'border-gray-400/30', bg: 'bg-gray-400/10', label: 'N-MOSFET', desc: 'Enhancement' },
+              { type: 'timer_555', category: 'Active', icon: Cpu, color: 'text-indigo-400', border: 'border-indigo-400/30', bg: 'bg-indigo-400/10', label: '555 Timer', desc: 'Oscillator/Timer' },
+              { type: 'op_amp', category: 'Active', icon: Cpu, color: 'text-indigo-500', border: 'border-indigo-500/30', bg: 'bg-indigo-500/10', label: 'Op-Amp', desc: 'LM358' },
+              { type: 'photoresistor', category: 'Passive', icon: Sun, color: 'text-red-400', border: 'border-red-400/30', bg: 'bg-red-400/10', label: 'Photoresistor', desc: 'LDR' },
+              { type: 'thermistor', category: 'Passive', icon: Activity, color: 'text-emerald-500', border: 'border-emerald-500/30', bg: 'bg-emerald-500/10', label: 'Thermistor', desc: 'Temp Sensor' },
+              { type: 'power_supply', category: 'Sources', icon: Battery, color: 'text-cyan-500', border: 'border-cyan-500/30', bg: 'bg-cyan-500/10', label: 'Power Supply', desc: 'Variable DC' },
+
             ].filter(comp => {
               const matchesSearch = leftOpen ? comp.label.toLowerCase().includes(searchQuery.toLowerCase()) : true;
               const matchesCategory = activeCategory === 'All' || comp.category === activeCategory;
@@ -933,6 +945,18 @@ export const UI = () => {
                 { type: 'buzzer', category: 'Output', icon: Volume2, color: 'text-fuchsia-400', border: 'border-fuchsia-400/30', bg: 'bg-fuchsia-400/10', label: 'Buzzer', desc: 'Piezo 440Hz' },
                 { type: 'voltmeter', category: 'Meters', icon: Activity, color: 'text-cyan-500', border: 'border-cyan-500/30', bg: 'bg-cyan-500/10', label: 'Voltmeter', desc: 'Measure V' },
                 { type: 'ammeter', category: 'Meters', icon: Activity, color: 'text-orange-500', border: 'border-orange-500/30', bg: 'bg-orange-500/10', label: 'Ammeter', desc: 'Measure I' },
+
+              { type: 'breadboard', category: 'Passive', icon: Grid, color: 'text-zinc-300', border: 'border-zinc-300/30', bg: 'bg-zinc-300/10', label: 'Breadboard', desc: 'Solderless Board' },
+              { type: 'ground', category: 'Sources', icon: ArrowRightToLine, color: 'text-green-500', border: 'border-green-500/30', bg: 'bg-green-500/10', label: 'Ground', desc: '0V Reference' },
+              { type: 'push_button', category: 'Active', icon: ToggleLeft, color: 'text-emerald-400', border: 'border-emerald-400/30', bg: 'bg-emerald-400/10', label: 'Push Button', desc: 'Momentary Switch' },
+              { type: 'transistor_pnp', category: 'Active', icon: Cpu, color: 'text-gray-400', border: 'border-gray-400/30', bg: 'bg-gray-400/10', label: 'PNP Transistor', desc: 'BJT PNP' },
+              { type: 'mosfet_n', category: 'Active', icon: Cpu, color: 'text-gray-400', border: 'border-gray-400/30', bg: 'bg-gray-400/10', label: 'N-MOSFET', desc: 'Enhancement' },
+              { type: 'timer_555', category: 'Active', icon: Cpu, color: 'text-indigo-400', border: 'border-indigo-400/30', bg: 'bg-indigo-400/10', label: '555 Timer', desc: 'Oscillator/Timer' },
+              { type: 'op_amp', category: 'Active', icon: Cpu, color: 'text-indigo-500', border: 'border-indigo-500/30', bg: 'bg-indigo-500/10', label: 'Op-Amp', desc: 'LM358' },
+              { type: 'photoresistor', category: 'Passive', icon: Sun, color: 'text-red-400', border: 'border-red-400/30', bg: 'bg-red-400/10', label: 'Photoresistor', desc: 'LDR' },
+              { type: 'thermistor', category: 'Passive', icon: Activity, color: 'text-emerald-500', border: 'border-emerald-500/30', bg: 'bg-emerald-500/10', label: 'Thermistor', desc: 'Temp Sensor' },
+              { type: 'power_supply', category: 'Sources', icon: Battery, color: 'text-cyan-500', border: 'border-cyan-500/30', bg: 'bg-cyan-500/10', label: 'Power Supply', desc: 'Variable DC' },
+
               ].filter(comp => {
                 const matchesSearch = comp.label.toLowerCase().includes(searchQuery.toLowerCase());
                 const matchesCategory = activeCategory === 'All' || comp.category === activeCategory;
@@ -1107,6 +1131,17 @@ export const UI = () => {
             <div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2">
               {[
                 { id: 'basic_led', name: 'Basic LED Circuit', desc: 'Battery, Switch, Resistor, LED' },
+
+                { id: 'breadboard_led', name: 'Breadboard LED', desc: 'LED on a Breadboard' },
+                { id: 'push_button_led', name: 'Push Button LED', desc: 'Momentary Switch Demo' },
+                { id: 'timer_blinker', name: '555 Timer Blinker', desc: 'Astable Multivibrator' },
+                { id: 'ldr_night_light', name: 'LDR Night Light', desc: 'Photoresistor + Transistor' },
+                { id: 'thermistor_divider', name: 'Thermistor Sensor', desc: 'Temperature Voltage Divider' },
+                { id: 'opamp_comparator', name: 'Op-Amp Comparator', desc: 'LM358 Comparator Circuit' },
+                { id: 'mosfet_switch', name: 'MOSFET Motor Switch', desc: 'N-Channel MOSFET Demo' },
+                { id: 'pnp_switch', name: 'PNP Transistor Switch', desc: 'High-side switching' },
+                { id: 'bench_supply_demo', name: 'Bench Power Supply', desc: 'Variable Voltage Source' },
+
                 { id: 'voltage_divider', name: 'Voltage Divider', desc: 'Battery, 2 Resistors, Voltmeter' },
                 { id: 'h_bridge', name: 'H-Bridge Motor Control', desc: '4 Switches, Battery, Motor' },
                 { id: 'transistor_switch', name: 'Transistor Switch', desc: 'NPN Transistor, Resistor, LED' },

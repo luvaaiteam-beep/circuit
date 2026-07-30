@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Grid, Html } from '@react-three/drei';
 import { useCircuitStore, ComponentType } from '../store';
-import { Battery, Resistor, LED, SwitchComp, Capacitor, Bulb, Diode, Inductor, Motor, Buzzer, Voltmeter, Ammeter, Potentiometer, TransistorNPN, Transformer, Fuse, SolarPanel, LogicGateAnd, LogicGateOr, RGBLED, ZenerDiode, Relay } from './Components3D';
+import { Battery, Resistor, LED, SwitchComp, Capacitor, Bulb, Diode, Inductor, Motor, Buzzer, Voltmeter, Ammeter, Potentiometer, TransistorNPN, Transformer, Fuse, SolarPanel, LogicGateAnd, LogicGateOr, RGBLED, ZenerDiode, Relay, Breadboard, Ground as GroundComponent, PushButton, TransistorPNP, MosfetN, Timer555, OpAmp, Photoresistor, Thermistor, PowerSupply } from './Components3D';
 import { Wires } from './Wires';
 import * as THREE from 'three';
 
@@ -165,6 +165,16 @@ const ComponentWrapper = React.memo(({ data }: { data: any }) => {
       {data.type === 'rgb_led' && <RGBLED data={data} />}
       {data.type === 'zener_diode' && <ZenerDiode data={data} />}
       {data.type === 'relay' && <Relay data={data} />}
+      {data.type === 'breadboard' && <Breadboard data={data} />}
+      {data.type === 'ground' && <GroundComponent data={data} />}
+      {data.type === 'push_button' && <PushButton data={data} />}
+      {data.type === 'transistor_pnp' && <TransistorPNP data={data} />}
+      {data.type === 'mosfet_n' && <MosfetN data={data} />}
+      {data.type === 'timer_555' && <Timer555 data={data} />}
+      {data.type === 'op_amp' && <OpAmp data={data} />}
+      {data.type === 'photoresistor' && <Photoresistor data={data} />}
+      {data.type === 'thermistor' && <Thermistor data={data} />}
+      {data.type === 'power_supply' && <PowerSupply data={data} />}
     </group>
   );
 }, (prev, next) => {
@@ -185,7 +195,7 @@ const Ground = () => {
   const handlePointerDown = (e: any) => {
     e.stopPropagation();
     const { activeTool, snapToGrid } = useCircuitStore.getState();
-    if (['battery', 'resistor', 'led', 'switch', 'capacitor', 'bulb', 'diode', 'inductor', 'motor', 'buzzer', 'voltmeter', 'ammeter', 'potentiometer', 'transistor_npn', 'transformer', 'fuse', 'solar_panel', 'logic_gate_and', 'logic_gate_or', 'rgb_led', 'zener_diode', 'relay'].includes(activeTool)) {
+    if (['battery', 'resistor', 'led', 'switch', 'capacitor', 'bulb', 'diode', 'inductor', 'motor', 'buzzer', 'voltmeter', 'ammeter', 'potentiometer', 'transistor_npn', 'transformer', 'fuse', 'solar_panel', 'logic_gate_and', 'logic_gate_or', 'rgb_led', 'zener_diode', 'relay', 'breadboard', 'ground', 'push_button', 'transistor_pnp', 'mosfet_n', 'timer_555', 'op_amp', 'photoresistor', 'thermistor', 'power_supply'].includes(activeTool)) {
       const point = e.point;
       let x = point.x;
       let z = point.z;

@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .then(async (result) => {
         if (result && result.user) {
           const user = result.user;
+          setUser(user);
           await setDoc(doc(db, 'users', user.uid), {
             email: user.email,
             displayName: user.displayName,
