@@ -142,7 +142,7 @@ async function startServer() {
       const isApi = req.path.startsWith('/api/');
       
       if (!isInternal && !hasExt && !isSpa && !isApi) {
-        res.status(410);
+        return res.status(410).send('Gone');
       }
       next();
     });
@@ -170,7 +170,7 @@ async function startServer() {
 
       const isSpa = VALID_ROUTES.has(req.path) || VALID_PREFIXES.some(p => req.path.startsWith(p));
       if (!isSpa) {
-        res.status(410);
+        return res.status(410).send('Gone');
       }
       res.sendFile(path.join(distPath, 'index.html'));
     });

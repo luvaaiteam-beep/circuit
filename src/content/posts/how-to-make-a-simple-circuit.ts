@@ -3,15 +3,15 @@ import { BlogPost } from '../../types/blog';
 export const post: BlogPost = {
   slug: 'how-to-make-a-simple-circuit',
   path: '/learn/how-to-make-a-simple-circuit',
-  metaTitle: 'How to Make a Simple Circuit (2026) — Step-by-Step Online Guide | CircuitForge',
-  metaDescription: 'Learn how to make a simple electric circuit in your browser — no components, no download needed. Covers what makes a circuit complete, common mistakes, open vs short circuit, and how to simulate it live. Free electric circuit maker included.',
+  metaTitle: 'How to Make a Simple Circuit Online | CircuitForge',
+  metaDescription: 'Learn how to make a simple electric circuit in your browser. Discover what makes a circuit complete and avoid common mistakes. Start building!',
   metaKeywords: 'how to make a simple circuit, how to make an electric circuit, electric circuit maker, simple circuit online, make a circuit in browser, how to make a simple circuit diagram, simple circuit for beginners, online circuit simulator free, circuit diagram maker free',
   canonicalUrl: 'https://luvaai.in/learn/how-to-make-a-simple-circuit',
   ogTitle: 'How to Make a Simple Circuit — Free Online Guide with Live Simulator',
-  ogDescription: 'Learn how to make a simple electric circuit in your browser — no components, no download needed. Covers what makes a circuit complete, common mistakes, open vs short circuit, and how to simulate it live. Free electric circuit maker included.',
+  ogDescription: 'Learn how to make a simple electric circuit in your browser. Discover what makes a circuit complete and avoid common mistakes. Start building!',
   ogImage: 'https://luvaai.in/og-image.jpg',
   twitterTitle: 'How to Make a Simple Circuit — Free Online Guide with Live Simulator',
-  twitterDescription: 'Learn how to make a simple electric circuit in your browser — no components, no download needed. Covers what makes a circuit complete, common mistakes, open vs short circuit, and how to simulate it live. Free electric circuit maker included.',
+  twitterDescription: 'Learn how to make a simple electric circuit in your browser. Discover what makes a circuit complete and avoid common mistakes. Start building!',
   datePublished: '2026-07-27',
   dateModified: '2026-07-27',
   category: 'Beginners Guide',
@@ -85,7 +85,7 @@ export const post: BlogPost = {
         }
       ],
       screenshot: {
-        src: '/blog/simple-circuit-running.jpg',
+        src: '/blog/simple-circuit-running.png',
         alt: 'Simple LED circuit running in CircuitForge with current flow visible',
         caption: 'The completed circuit running in CircuitForge. The animated dots show current flowing from the battery through the resistor and into the LED.'
       },
@@ -148,7 +148,7 @@ export const post: BlogPost = {
         }
       ],
       screenshot: {
-        src: '/blog/resistor-value-panel.jpg',
+        src: '/blog/resistor-value-panel.png',
         alt: 'CircuitForge component properties panel showing resistance value input',
         caption: 'Clicking any component opens its properties panel. Drop the resistance from 1000Ω to 220Ω and watch the LED get brighter instantly.'
       }

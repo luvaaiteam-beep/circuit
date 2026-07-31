@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom/server';
 import { AuthProvider } from '../src/hooks/useAuth';
-import { HelmetProvider } from 'react-helmet-async';
+import { HelmetProvider, HelmetServerState } from 'react-helmet-async';
 import fs from 'fs';
 import path from 'path';
 
@@ -22,7 +22,7 @@ const template = fs.readFileSync(path.resolve(process.cwd(), 'dist/index.html'),
 
 routes.forEach(route => {
   const Component = route.component;
-  const helmetContext = {};
+  const helmetContext: { helmet?: HelmetServerState } = {};
 
   const html = ReactDOMServer.renderToString(
     <HelmetProvider context={helmetContext}>
@@ -39,7 +39,7 @@ routes.forEach(route => {
   // Custom extraction logic for title based on the route
   let title = 'CircuitForge';
   if (route.path === '/learn/how-to-make-a-simple-circuit') {
-    title = 'How to Make a Simple Circuit (2026) — Step-by-Step Online Guide | CircuitForge';
+    title = 'How to Make a Simple Circuit Online | CircuitForge';
   } else if (route.path === '/learn/electric-circuit-school-project') {
     title = 'Electric Circuit School Project (2026) — Guide & Examples | CircuitForge';
   } else if (route.path === '/multisim-alternative') {
@@ -52,6 +52,7 @@ routes.forEach(route => {
   
   // ALWAYS strip out the base canonical link
   finalHtml = finalHtml.replace(/<link rel="canonical"[^>]*>/g, '');
+  finalHtml = finalHtml.replace(/<link rel="alternate"[^>]*>/g, '');
   finalHtml = finalHtml.replace(/<meta property="og:[^>]+>/g, '');
   finalHtml = finalHtml.replace(/<meta name="twitter:[^>]+>/g, '');
   finalHtml = finalHtml.replace(/<meta name="description"[^>]+>/g, '');

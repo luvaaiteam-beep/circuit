@@ -17,6 +17,9 @@ export const CookieConsent = () => {
 
   const handleAcceptAll = () => {
     localStorage.setItem('cf_cookie_consent', 'all');
+    if (typeof (window as any).gtag === 'function') {
+      (window as any).gtag('config', 'G-Z94X17ZD4K');
+    }
     setIsVisible(false);
   };
 

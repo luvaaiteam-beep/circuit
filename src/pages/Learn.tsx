@@ -13,14 +13,14 @@ export const Learn = () => {
       description: "You don't need to buy anything. This guide shows you how to make a simple electric circuit and circuit diagram in your browser using CircuitForge.",
       path: "/learn/how-to-make-a-simple-circuit",
       category: "Beginners",
-      date: "Aug 15, 2026"
+      date: "Jul 27, 2026"
     },
     {
       title: "Simple Electric Circuit School Project — Build & Simulate",
       description: "Working on a circuit project for school? This guide walks you through building, simulating, and presenting a simple electric circuit for your science fair.",
       path: "/learn/electric-circuit-school-project",
       category: "Students",
-      date: "Aug 16, 2026"
+      date: "Jul 27, 2026"
     }
   ];
 
