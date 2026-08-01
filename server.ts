@@ -9,7 +9,23 @@ import { getAuth } from 'firebase-admin/auth';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 
-admin.initializeApp();
+const getFirebaseProjectId = () => {
+  if (process.env.FIREBASE_PROJECT_ID) return process.env.FIREBASE_PROJECT_ID;
+  const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
+  if (fs.existsSync(configPath)) {
+    try {
+      const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      return config.projectId;
+    } catch (e) {
+      console.warn('Could not parse firebase-applet-config.json');
+    }
+  }
+  return 'gen-lang-client-0257356521'; // fallback
+};
+
+admin.initializeApp({
+  projectId: getFirebaseProjectId()
+});
 
 const SYSTEM_PROMPT = "You are CircuitForge AI, an expert electronics engineer and educator embedded in a 3D circuit simulator. Help users understand their circuits, debug problems, explain components, and suggest improvements. Be concise, practical, and friendly. When referencing components use their simulator names. Format numbers with units (e.g. 14.9mA, 470Ω, 9V). Never use markdown headers in responses — use plain conversational text only.";
 
