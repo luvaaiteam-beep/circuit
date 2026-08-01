@@ -13,6 +13,11 @@ admin.initializeApp();
 
 const SYSTEM_PROMPT = "You are CircuitForge AI, an expert electronics engineer and educator embedded in a 3D circuit simulator. Help users understand their circuits, debug problems, explain components, and suggest improvements. Be concise, practical, and friendly. When referencing components use their simulator names. Format numbers with units (e.g. 14.9mA, 470Ω, 9V). Never use markdown headers in responses — use plain conversational text only.";
 
+// Gemini model ID — check https://ai.google.dev/gemini-api/docs/models
+// periodically, Google deprecates model IDs faster than their official
+// shutdown dates suggest.
+const GEMINI_MODEL = "gemini-3.6-flash";
+
 const VALID_ROUTES = new Set([
   '/', '/sim', '/simulator', '/gallery', '/features', '/about', '/privacy', '/terms',
   '/learn', '/multisim-alternative'
@@ -80,7 +85,7 @@ async function startServer() {
       const { question, circuitContext } = req.body;
       const client = getGeminiClient();
       const response = await client.models.generateContent({
-        model: "gemini-2.5-pro",
+        model: GEMINI_MODEL,
         contents: question,
         config: {
           systemInstruction: `${SYSTEM_PROMPT}\n\nCurrent Circuit Context:\n${circuitContext}`,
@@ -97,7 +102,7 @@ async function startServer() {
       const { userMessage, history, circuitContext } = req.body;
       const client = getGeminiClient();
       const chat = client.chats.create({
-        model: "gemini-2.5-pro",
+        model: GEMINI_MODEL,
         config: {
           systemInstruction: `${SYSTEM_PROMPT}\n\nCurrent Circuit Context:\n${circuitContext}`,
         },

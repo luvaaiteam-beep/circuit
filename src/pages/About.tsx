@@ -61,6 +61,28 @@ export const About = () => {
               To democratize electronics education. CircuitForge is free, requires no login to start experimenting, and is built with modern open-source technologies.
             </p>
 
+            <h2 className="text-2xl font-bold text-white mt-12 mb-4">Who's Behind This</h2>
+            <p>
+              CircuitForge is built and maintained by one person — me, Advik. I'm a
+              student, not a professional electronics engineer, and I don't have a
+              degree or formal industry background in this field. I built this because
+              I wanted a hands-on way to learn circuits myself, and it grew from there.
+            </p>
+            <p>
+              Because I'm learning too, I take accuracy seriously: every simulator
+              behavior and every blog post is backed by real research — datasheets,
+              reference texts, and the sources linked in each article — and I use AI
+              tools as part of my day-to-day workflow to move faster on both writing
+              and development. Nothing here is published without me personally
+              checking it first.
+            </p>
+            <p>
+              If you ever spot something wrong — a bug, a bad explanation, an inaccurate
+              circuit — please tell me. You can reach me at
+              <a href="mailto:pankaj088@gmail.com" className="text-cyan-400 hover:underline"> pankaj088@gmail.com</a>.
+              Corrections make this better for everyone using it.
+            </p>
+
             <div className="mt-16 p-8 bg-zinc-900 border border-zinc-800 rounded-2xl text-center">
               <h3 className="text-xl font-bold text-white mb-4">Join our community</h3>
               <p className="text-zinc-400 mb-6 text-base">Explore what others are building or share your own complex systems with the world.</p>

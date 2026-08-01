@@ -1,6 +1,5 @@
 import React, { Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'motion/react';
 import { Home } from './pages/Home';
 import { Gallery } from './pages/Gallery';
@@ -38,15 +37,9 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => (
 
 export const RouterComponent = () => {
   const location = useLocation();
-  const canonicalUrl = `https://luvaai.in${location.pathname === '/' ? '' : location.pathname}`;
   return (
-    <>
-      <Helmet>
-        <link rel="alternate" hreflang="x-default" href={canonicalUrl} />
-        <link rel="alternate" hreflang="en" href={canonicalUrl} />
-      </Helmet>
-      <Suspense fallback={<LoadingScreen />}>
-        <AnimatePresence mode="wait">
+    <Suspense fallback={<LoadingScreen />}>
+      <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><Home /></PageTransition>} />
           <Route path="/sim" element={<PageTransition><App /></PageTransition>} />
@@ -66,6 +59,5 @@ export const RouterComponent = () => {
         </Routes>
       </AnimatePresence>
     </Suspense>
-    </>
   );
 };

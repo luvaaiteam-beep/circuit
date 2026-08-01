@@ -51,7 +51,8 @@ export async function* streamAsk(
   });
 
   if (!response.ok) {
-    throw new Error('Network response was not ok');
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Network error');
   }
 
   const reader = response.body?.getReader();
@@ -80,8 +81,10 @@ export async function* streamAsk(
           const data = JSON.parse(dataStr);
           if (data.error) throw new Error(data.error);
           if (data.text) yield data.text;
-        } catch (e) {
-          // parse error or handled error
+        } catch (e: any) {
+          if (e.message && e.message !== "Unexpected end of JSON input") {
+            throw e;
+          }
         }
       }
       boundary = buffer.indexOf('\n\n');

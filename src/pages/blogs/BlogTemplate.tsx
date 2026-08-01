@@ -5,6 +5,7 @@ import { motion, useScroll, useSpring } from 'motion/react';
 import { ArrowLeft, Check, Terminal, Zap, Lightbulb, Link as LinkIcon, Eye, ChevronRight, Copy, ArrowRight, ImageIcon, Sparkles, Box, ExternalLink, BookOpen, ChevronDown } from 'lucide-react';
 import { Navigation } from '../../components/Navigation';
 import { Footer } from '../../components/Footer';
+import { AuthorBox } from '../../components/AuthorBox';
 import { BlogPost, BlogSection } from '../../types/blog';
 
 const ScreenshotPlaceholder = ({ src, alt, caption }: { src: string; alt: string; caption: string }) => (
@@ -13,6 +14,7 @@ const ScreenshotPlaceholder = ({ src, alt, caption }: { src: string; alt: string
       <img
         src={src}
         alt={alt}
+        loading="lazy"
         className="w-full object-cover"
         style={{ maxHeight: '400px' }}
         onError={(e) => {
@@ -268,9 +270,9 @@ export const BlogTemplate = ({ post }: { post: BlogPost }) => {
               <div className="flex flex-wrap items-center gap-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-cyan-950 text-cyan-400 flex items-center justify-center font-bold border border-cyan-900">
-                    CF
+                    AD
                   </div>
-                  <span className="text-zinc-300 font-medium">By the CircuitForge Team</span>
+                  <span className="text-zinc-300 font-medium">By Advik</span>
                 </div>
               </div>
               
@@ -304,6 +306,8 @@ export const BlogTemplate = ({ post }: { post: BlogPost }) => {
               <img 
                 src={post.heroImage.src} 
                 alt={post.heroImage.alt}
+                loading="eager"
+                fetchpriority="high"
                 className="w-full rounded-2xl object-cover border border-zinc-800"
                 style={{ height: '320px' }}
                 onError={(e) => {
@@ -562,6 +566,7 @@ export const BlogTemplate = ({ post }: { post: BlogPost }) => {
               </div>
             )}
 
+            <AuthorBox />
           </div>
         </article>
       </div>

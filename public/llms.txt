@@ -1,0 +1,27 @@
+# CircuitForge
+
+> Build, simulate and share electronic circuits in 3D right in your browser. Free browser-based circuit simulator with electronic components, real MNA nodal analysis physics, and an AI assistant. No download required. Built with React, Three.js, and Firebase.
+
+CircuitForge lets students, hobbyists, and educators design circuits visually in 3D, place real components (like batteries, resistors, LEDs, switches, logic gates, and transistors), and run accurate electrical simulations directly in the browser. It includes an AI assistant (powered by Gemini) for circuit help, a public gallery of shared circuits, and embeddable circuit widgets.
+
+## Core Pages
+
+- [Simulator](https://luvaai.in/simulator): The main 3D circuit-building and simulation tool.
+- [Features](https://luvaai.in/features): Full list of supported components and capabilities.
+- [Gallery](https://luvaai.in/gallery): Publicly shared circuits built by users.
+- [About](https://luvaai.in/about): Project background and mission.
+
+## Learn / Educational Content
+
+- [Learn Hub](https://luvaai.in/learn): Electronics tutorials and guides.
+- [How to Make a Simple Circuit](https://luvaai.in/learn/how-to-make-a-simple-circuit): Beginner guide to building a basic circuit.
+- [Electric Circuit School Project Ideas](https://luvaai.in/learn/electric-circuit-school-project): Circuit project ideas for students.
+
+## Comparisons
+
+- [Multisim Alternative](https://luvaai.in/multisim-alternative): Free alternative to NI Multisim Live (shutting down September 2026).
+
+## Optional
+
+- [Privacy Policy](https://luvaai.in/privacy)
+- [Terms of Service](https://luvaai.in/terms)

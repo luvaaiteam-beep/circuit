@@ -5,6 +5,41 @@ import { useAuth } from '../hooks/useAuth';
 import { Link } from 'react-router-dom';
 import { saveCircuit, shareCircuit } from '../services/circuitService';
 
+const COMPONENT_LIBRARY = [
+  { type: 'battery', category: 'Sources', icon: Battery, color: 'text-cyan-400', border: 'border-cyan-400/30', bg: 'bg-cyan-400/10', label: 'Battery', desc: '9V DC source', shortDesc: '9V DC source' },
+  { type: 'solar_panel', category: 'Sources', icon: Sun, color: 'text-yellow-300', border: 'border-yellow-300/30', bg: 'bg-yellow-300/10', label: 'Solar Panel', desc: 'Light to Power', shortDesc: 'Light to Power' },
+  { type: 'resistor', category: 'Passive', icon: Zap, color: 'text-orange-400', border: 'border-orange-400/30', bg: 'bg-orange-400/10', label: 'Resistor', desc: '100Ω default', shortDesc: '100Ω' },
+  { type: 'capacitor', category: 'Passive', icon: Settings, color: 'text-purple-400', border: 'border-purple-400/30', bg: 'bg-purple-400/10', label: 'Capacitor', desc: '100µF', shortDesc: '100µF' },
+  { type: 'inductor', category: 'Passive', icon: Magnet, color: 'text-orange-500', border: 'border-orange-500/30', bg: 'bg-orange-500/10', label: 'Inductor', desc: '10mH', shortDesc: '10mH' },
+  { type: 'transformer', category: 'Passive', icon: Zap, color: 'text-indigo-400', border: 'border-indigo-400/30', bg: 'bg-indigo-400/10', label: 'Transformer', desc: 'AC Voltage Step', shortDesc: 'AC Step' },
+  { type: 'fuse', category: 'Passive', icon: ShieldAlert, color: 'text-red-400', border: 'border-red-400/30', bg: 'bg-red-400/10', label: 'Fuse', desc: 'Overcurrent Protect', shortDesc: 'Protect' },
+  { type: 'potentiometer', category: 'Passive', icon: SlidersHorizontal, color: 'text-yellow-500', border: 'border-yellow-500/30', bg: 'bg-yellow-500/10', label: 'Potentiometer', desc: 'Variable Resistor', shortDesc: 'Var Resistor' },
+  { type: 'switch', category: 'Active', icon: ToggleLeft, color: 'text-emerald-400', border: 'border-emerald-400/30', bg: 'bg-emerald-400/10', label: 'Switch', desc: 'Toggle ON/OFF', shortDesc: 'ON/OFF' },
+  { type: 'relay', category: 'Active', icon: ToggleRight, color: 'text-amber-500', border: 'border-amber-500/30', bg: 'bg-amber-500/10', label: 'Relay', desc: 'Electromech Switch', shortDesc: 'Mech Switch' },
+  { type: 'diode', category: 'Active', icon: ArrowRightToLine, color: 'text-blue-400', border: 'border-blue-400/30', bg: 'bg-blue-400/10', label: 'Diode', desc: '1N4148', shortDesc: '1N4148' },
+  { type: 'zener_diode', category: 'Active', icon: ArrowRightToLine, color: 'text-red-500', border: 'border-red-500/30', bg: 'bg-red-500/10', label: 'Zener Diode', desc: 'Voltage Reg', shortDesc: 'Vol Reg' },
+  { type: 'transistor_npn', category: 'Active', icon: Cpu, color: 'text-gray-400', border: 'border-gray-400/30', bg: 'bg-gray-400/10', label: 'NPN Transistor', desc: 'BJT', shortDesc: 'BJT' },
+  { type: 'logic_gate_and', category: 'Logic', icon: Cpu, color: 'text-emerald-500', border: 'border-emerald-500/30', bg: 'bg-emerald-500/10', label: 'AND Gate', desc: 'Logic AND', shortDesc: 'Logic AND' },
+  { type: 'logic_gate_or', category: 'Logic', icon: Cpu, color: 'text-blue-500', border: 'border-blue-500/30', bg: 'bg-blue-500/10', label: 'OR Gate', desc: 'Logic OR', shortDesc: 'Logic OR' },
+  { type: 'led', category: 'Output', icon: Lightbulb, color: 'text-pink-400', border: 'border-pink-400/30', bg: 'bg-pink-400/10', label: 'LED', desc: '2.0V forward', shortDesc: '2.0V' },
+  { type: 'rgb_led', category: 'Output', icon: Lightbulb, color: 'text-pink-500', border: 'border-pink-500/30', bg: 'bg-pink-500/10', label: 'RGB LED', desc: 'Multi-color LED', shortDesc: 'Multi-color' },
+  { type: 'bulb', category: 'Output', icon: Lightbulb, color: 'text-yellow-400', border: 'border-yellow-400/30', bg: 'bg-yellow-400/10', label: 'Bulb', desc: 'Incandescent', shortDesc: 'Incandescent' },
+  { type: 'motor', category: 'Output', icon: Fan, color: 'text-rose-400', border: 'border-rose-400/30', bg: 'bg-rose-400/10', label: 'Motor', desc: 'DC 3V-9V', shortDesc: 'DC 3V-9V' },
+  { type: 'buzzer', category: 'Output', icon: Volume2, color: 'text-fuchsia-400', border: 'border-fuchsia-400/30', bg: 'bg-fuchsia-400/10', label: 'Buzzer', desc: 'Piezo 440Hz', shortDesc: 'Piezo 440Hz' },
+  { type: 'voltmeter', category: 'Meters', icon: Activity, color: 'text-cyan-500', border: 'border-cyan-500/30', bg: 'bg-cyan-500/10', label: 'Voltmeter', desc: 'Measures Voltage', shortDesc: 'Measure V' },
+  { type: 'ammeter', category: 'Meters', icon: Activity, color: 'text-orange-500', border: 'border-orange-500/30', bg: 'bg-orange-500/10', label: 'Ammeter', desc: 'Measures Current', shortDesc: 'Measure I' },
+  { type: 'breadboard', category: 'Passive', icon: Grid, color: 'text-zinc-300', border: 'border-zinc-300/30', bg: 'bg-zinc-300/10', label: 'Breadboard', desc: 'Solderless Board', shortDesc: 'Solderless Board' },
+  { type: 'ground', category: 'Sources', icon: ArrowRightToLine, color: 'text-green-500', border: 'border-green-500/30', bg: 'bg-green-500/10', label: 'Ground', desc: '0V Reference', shortDesc: '0V Reference' },
+  { type: 'push_button', category: 'Active', icon: ToggleLeft, color: 'text-emerald-400', border: 'border-emerald-400/30', bg: 'bg-emerald-400/10', label: 'Push Button', desc: 'Momentary Switch', shortDesc: 'Momentary Switch' },
+  { type: 'transistor_pnp', category: 'Active', icon: Cpu, color: 'text-gray-400', border: 'border-gray-400/30', bg: 'bg-gray-400/10', label: 'PNP Transistor', desc: 'BJT PNP', shortDesc: 'BJT PNP' },
+  { type: 'mosfet_n', category: 'Active', icon: Cpu, color: 'text-gray-400', border: 'border-gray-400/30', bg: 'bg-gray-400/10', label: 'N-MOSFET', desc: 'Enhancement', shortDesc: 'Enhancement' },
+  { type: 'timer_555', category: 'Active', icon: Cpu, color: 'text-indigo-400', border: 'border-indigo-400/30', bg: 'bg-indigo-400/10', label: '555 Timer', desc: 'Oscillator/Timer', shortDesc: 'Oscillator/Timer' },
+  { type: 'op_amp', category: 'Active', icon: Cpu, color: 'text-indigo-500', border: 'border-indigo-500/30', bg: 'bg-indigo-500/10', label: 'Op-Amp', desc: 'LM358', shortDesc: 'LM358' },
+  { type: 'photoresistor', category: 'Passive', icon: Sun, color: 'text-red-400', border: 'border-red-400/30', bg: 'bg-red-400/10', label: 'Photoresistor', desc: 'LDR', shortDesc: 'LDR' },
+  { type: 'thermistor', category: 'Passive', icon: Activity, color: 'text-emerald-500', border: 'border-emerald-500/30', bg: 'bg-emerald-500/10', label: 'Thermistor', desc: 'Temp Sensor', shortDesc: 'Temp Sensor' },
+  { type: 'power_supply', category: 'Sources', icon: Battery, color: 'text-cyan-500', border: 'border-cyan-500/30', bg: 'bg-cyan-500/10', label: 'Power Supply', desc: 'Variable DC', shortDesc: 'Variable DC' },
+];
+
 const Minimap = () => {
   const { components, wires, selectedCompId } = useCircuitStore();
   if (components.length === 0) return null;
@@ -172,9 +207,10 @@ export const UI = () => {
           return newHistory;
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("AI Error:", error);
-      setAiHistory(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please check your API key.' }]);
+      const errorMsg = error.message || 'Sorry, I encountered an error.';
+      setAiHistory(prev => [...prev, { role: 'assistant', content: errorMsg }]);
     } finally {
       setAiLoading(false);
     }
@@ -497,42 +533,7 @@ export const UI = () => {
           )}
           
           <div className="grid grid-cols-1 gap-2">
-            {[
-              { type: 'battery', category: 'Sources', icon: Battery, color: 'text-cyan-400', border: 'border-cyan-400/30', bg: 'bg-cyan-400/10', label: 'Battery', desc: '9V DC source' },
-              { type: 'solar_panel', category: 'Sources', icon: Sun, color: 'text-yellow-300', border: 'border-yellow-300/30', bg: 'bg-yellow-300/10', label: 'Solar Panel', desc: 'Light to Power' },
-              { type: 'resistor', category: 'Passive', icon: Zap, color: 'text-orange-400', border: 'border-orange-400/30', bg: 'bg-orange-400/10', label: 'Resistor', desc: '100Ω default' },
-              { type: 'capacitor', category: 'Passive', icon: Settings, color: 'text-purple-400', border: 'border-purple-400/30', bg: 'bg-purple-400/10', label: 'Capacitor', desc: '100µF' },
-              { type: 'inductor', category: 'Passive', icon: Magnet, color: 'text-orange-500', border: 'border-orange-500/30', bg: 'bg-orange-500/10', label: 'Inductor', desc: '10mH' },
-              { type: 'transformer', category: 'Passive', icon: Zap, color: 'text-indigo-400', border: 'border-indigo-400/30', bg: 'bg-indigo-400/10', label: 'Transformer', desc: 'AC Voltage Step' },
-              { type: 'fuse', category: 'Passive', icon: ShieldAlert, color: 'text-red-400', border: 'border-red-400/30', bg: 'bg-red-400/10', label: 'Fuse', desc: 'Overcurrent Protect' },
-              { type: 'potentiometer', category: 'Passive', icon: SlidersHorizontal, color: 'text-yellow-500', border: 'border-yellow-500/30', bg: 'bg-yellow-500/10', label: 'Potentiometer', desc: 'Variable Resistor' },
-              { type: 'switch', category: 'Active', icon: ToggleLeft, color: 'text-emerald-400', border: 'border-emerald-400/30', bg: 'bg-emerald-400/10', label: 'Switch', desc: 'Toggle ON/OFF' },
-              { type: 'relay', category: 'Active', icon: ToggleRight, color: 'text-amber-500', border: 'border-amber-500/30', bg: 'bg-amber-500/10', label: 'Relay', desc: 'Electromech Switch' },
-              { type: 'diode', category: 'Active', icon: ArrowRightToLine, color: 'text-blue-400', border: 'border-blue-400/30', bg: 'bg-blue-400/10', label: 'Diode', desc: '1N4148' },
-              { type: 'zener_diode', category: 'Active', icon: ArrowRightToLine, color: 'text-red-500', border: 'border-red-500/30', bg: 'bg-red-500/10', label: 'Zener Diode', desc: 'Voltage Reg' },
-              { type: 'transistor_npn', category: 'Active', icon: Cpu, color: 'text-gray-400', border: 'border-gray-400/30', bg: 'bg-gray-400/10', label: 'NPN Transistor', desc: 'BJT' },
-              { type: 'logic_gate_and', category: 'Logic', icon: Cpu, color: 'text-emerald-500', border: 'border-emerald-500/30', bg: 'bg-emerald-500/10', label: 'AND Gate', desc: 'Logic AND' },
-              { type: 'logic_gate_or', category: 'Logic', icon: Cpu, color: 'text-blue-500', border: 'border-blue-500/30', bg: 'bg-blue-500/10', label: 'OR Gate', desc: 'Logic OR' },
-              { type: 'led', category: 'Output', icon: Lightbulb, color: 'text-pink-400', border: 'border-pink-400/30', bg: 'bg-pink-400/10', label: 'LED', desc: '2.0V forward' },
-              { type: 'rgb_led', category: 'Output', icon: Lightbulb, color: 'text-pink-500', border: 'border-pink-500/30', bg: 'bg-pink-500/10', label: 'RGB LED', desc: 'Multi-color LED' },
-              { type: 'bulb', category: 'Output', icon: Lightbulb, color: 'text-yellow-400', border: 'border-yellow-400/30', bg: 'bg-yellow-400/10', label: 'Bulb', desc: 'Incandescent' },
-              { type: 'motor', category: 'Output', icon: Fan, color: 'text-rose-400', border: 'border-rose-400/30', bg: 'bg-rose-400/10', label: 'Motor', desc: 'DC 3V-9V' },
-              { type: 'buzzer', category: 'Output', icon: Volume2, color: 'text-fuchsia-400', border: 'border-fuchsia-400/30', bg: 'bg-fuchsia-400/10', label: 'Buzzer', desc: 'Piezo 440Hz' },
-              { type: 'voltmeter', category: 'Meters', icon: Activity, color: 'text-cyan-500', border: 'border-cyan-500/30', bg: 'bg-cyan-500/10', label: 'Voltmeter', desc: 'Measures Voltage' },
-              { type: 'ammeter', category: 'Meters', icon: Activity, color: 'text-orange-500', border: 'border-orange-500/30', bg: 'bg-orange-500/10', label: 'Ammeter', desc: 'Measures Current' },
-
-              { type: 'breadboard', category: 'Passive', icon: Grid, color: 'text-zinc-300', border: 'border-zinc-300/30', bg: 'bg-zinc-300/10', label: 'Breadboard', desc: 'Solderless Board' },
-              { type: 'ground', category: 'Sources', icon: ArrowRightToLine, color: 'text-green-500', border: 'border-green-500/30', bg: 'bg-green-500/10', label: 'Ground', desc: '0V Reference' },
-              { type: 'push_button', category: 'Active', icon: ToggleLeft, color: 'text-emerald-400', border: 'border-emerald-400/30', bg: 'bg-emerald-400/10', label: 'Push Button', desc: 'Momentary Switch' },
-              { type: 'transistor_pnp', category: 'Active', icon: Cpu, color: 'text-gray-400', border: 'border-gray-400/30', bg: 'bg-gray-400/10', label: 'PNP Transistor', desc: 'BJT PNP' },
-              { type: 'mosfet_n', category: 'Active', icon: Cpu, color: 'text-gray-400', border: 'border-gray-400/30', bg: 'bg-gray-400/10', label: 'N-MOSFET', desc: 'Enhancement' },
-              { type: 'timer_555', category: 'Active', icon: Cpu, color: 'text-indigo-400', border: 'border-indigo-400/30', bg: 'bg-indigo-400/10', label: '555 Timer', desc: 'Oscillator/Timer' },
-              { type: 'op_amp', category: 'Active', icon: Cpu, color: 'text-indigo-500', border: 'border-indigo-500/30', bg: 'bg-indigo-500/10', label: 'Op-Amp', desc: 'LM358' },
-              { type: 'photoresistor', category: 'Passive', icon: Sun, color: 'text-red-400', border: 'border-red-400/30', bg: 'bg-red-400/10', label: 'Photoresistor', desc: 'LDR' },
-              { type: 'thermistor', category: 'Passive', icon: Activity, color: 'text-emerald-500', border: 'border-emerald-500/30', bg: 'bg-emerald-500/10', label: 'Thermistor', desc: 'Temp Sensor' },
-              { type: 'power_supply', category: 'Sources', icon: Battery, color: 'text-cyan-500', border: 'border-cyan-500/30', bg: 'bg-cyan-500/10', label: 'Power Supply', desc: 'Variable DC' },
-
-            ].filter(comp => {
+            {COMPONENT_LIBRARY.filter(comp => {
               const matchesSearch = leftOpen ? comp.label.toLowerCase().includes(searchQuery.toLowerCase()) : true;
               const matchesCategory = activeCategory === 'All' || comp.category === activeCategory;
               return matchesSearch && matchesCategory;
@@ -922,42 +923,7 @@ export const UI = () => {
           </div>
           <div className="p-4 flex-1 overflow-y-auto custom-scrollbar">
             <div className="grid grid-cols-2 gap-2">
-              {[
-                { type: 'battery', category: 'Sources', icon: Battery, color: 'text-cyan-400', border: 'border-cyan-400/30', bg: 'bg-cyan-400/10', label: 'Battery', desc: '9V DC source' },
-                { type: 'solar_panel', category: 'Sources', icon: Sun, color: 'text-yellow-300', border: 'border-yellow-300/30', bg: 'bg-yellow-300/10', label: 'Solar Panel', desc: 'Light to Power' },
-                { type: 'resistor', category: 'Passive', icon: Zap, color: 'text-orange-400', border: 'border-orange-400/30', bg: 'bg-orange-400/10', label: 'Resistor', desc: '100Ω' },
-                { type: 'capacitor', category: 'Passive', icon: Settings, color: 'text-purple-400', border: 'border-purple-400/30', bg: 'bg-purple-400/10', label: 'Capacitor', desc: '100µF' },
-                { type: 'inductor', category: 'Passive', icon: Magnet, color: 'text-orange-500', border: 'border-orange-500/30', bg: 'bg-orange-500/10', label: 'Inductor', desc: '10mH' },
-                { type: 'transformer', category: 'Passive', icon: Zap, color: 'text-indigo-400', border: 'border-indigo-400/30', bg: 'bg-indigo-400/10', label: 'Transformer', desc: 'AC Step' },
-                { type: 'fuse', category: 'Passive', icon: ShieldAlert, color: 'text-red-400', border: 'border-red-400/30', bg: 'bg-red-400/10', label: 'Fuse', desc: 'Protect' },
-                { type: 'potentiometer', category: 'Passive', icon: SlidersHorizontal, color: 'text-yellow-500', border: 'border-yellow-500/30', bg: 'bg-yellow-500/10', label: 'Potentiometer', desc: 'Var Resistor' },
-                { type: 'switch', category: 'Active', icon: ToggleLeft, color: 'text-emerald-400', border: 'border-emerald-400/30', bg: 'bg-emerald-400/10', label: 'Switch', desc: 'ON/OFF' },
-                { type: 'relay', category: 'Active', icon: ToggleRight, color: 'text-amber-500', border: 'border-amber-500/30', bg: 'bg-amber-500/10', label: 'Relay', desc: 'Mech Switch' },
-                { type: 'diode', category: 'Active', icon: ArrowRightToLine, color: 'text-blue-400', border: 'border-blue-400/30', bg: 'bg-blue-400/10', label: 'Diode', desc: '1N4148' },
-                { type: 'zener_diode', category: 'Active', icon: ArrowRightToLine, color: 'text-red-500', border: 'border-red-500/30', bg: 'bg-red-500/10', label: 'Zener Diode', desc: 'Vol Reg' },
-                { type: 'transistor_npn', category: 'Active', icon: Cpu, color: 'text-gray-400', border: 'border-gray-400/30', bg: 'bg-gray-400/10', label: 'NPN Transistor', desc: 'BJT' },
-                { type: 'logic_gate_and', category: 'Logic', icon: Cpu, color: 'text-emerald-500', border: 'border-emerald-500/30', bg: 'bg-emerald-500/10', label: 'AND Gate', desc: 'Logic AND' },
-                { type: 'logic_gate_or', category: 'Logic', icon: Cpu, color: 'text-blue-500', border: 'border-blue-500/30', bg: 'bg-blue-500/10', label: 'OR Gate', desc: 'Logic OR' },
-                { type: 'led', category: 'Output', icon: Lightbulb, color: 'text-pink-400', border: 'border-pink-400/30', bg: 'bg-pink-400/10', label: 'LED', desc: '2.0V' },
-                { type: 'rgb_led', category: 'Output', icon: Lightbulb, color: 'text-pink-500', border: 'border-pink-500/30', bg: 'bg-pink-500/10', label: 'RGB LED', desc: 'Multi-color' },
-                { type: 'bulb', category: 'Output', icon: Lightbulb, color: 'text-yellow-400', border: 'border-yellow-400/30', bg: 'bg-yellow-400/10', label: 'Bulb', desc: 'Incandescent' },
-                { type: 'motor', category: 'Output', icon: Fan, color: 'text-rose-400', border: 'border-rose-400/30', bg: 'bg-rose-400/10', label: 'Motor', desc: 'DC 3V-9V' },
-                { type: 'buzzer', category: 'Output', icon: Volume2, color: 'text-fuchsia-400', border: 'border-fuchsia-400/30', bg: 'bg-fuchsia-400/10', label: 'Buzzer', desc: 'Piezo 440Hz' },
-                { type: 'voltmeter', category: 'Meters', icon: Activity, color: 'text-cyan-500', border: 'border-cyan-500/30', bg: 'bg-cyan-500/10', label: 'Voltmeter', desc: 'Measure V' },
-                { type: 'ammeter', category: 'Meters', icon: Activity, color: 'text-orange-500', border: 'border-orange-500/30', bg: 'bg-orange-500/10', label: 'Ammeter', desc: 'Measure I' },
-
-              { type: 'breadboard', category: 'Passive', icon: Grid, color: 'text-zinc-300', border: 'border-zinc-300/30', bg: 'bg-zinc-300/10', label: 'Breadboard', desc: 'Solderless Board' },
-              { type: 'ground', category: 'Sources', icon: ArrowRightToLine, color: 'text-green-500', border: 'border-green-500/30', bg: 'bg-green-500/10', label: 'Ground', desc: '0V Reference' },
-              { type: 'push_button', category: 'Active', icon: ToggleLeft, color: 'text-emerald-400', border: 'border-emerald-400/30', bg: 'bg-emerald-400/10', label: 'Push Button', desc: 'Momentary Switch' },
-              { type: 'transistor_pnp', category: 'Active', icon: Cpu, color: 'text-gray-400', border: 'border-gray-400/30', bg: 'bg-gray-400/10', label: 'PNP Transistor', desc: 'BJT PNP' },
-              { type: 'mosfet_n', category: 'Active', icon: Cpu, color: 'text-gray-400', border: 'border-gray-400/30', bg: 'bg-gray-400/10', label: 'N-MOSFET', desc: 'Enhancement' },
-              { type: 'timer_555', category: 'Active', icon: Cpu, color: 'text-indigo-400', border: 'border-indigo-400/30', bg: 'bg-indigo-400/10', label: '555 Timer', desc: 'Oscillator/Timer' },
-              { type: 'op_amp', category: 'Active', icon: Cpu, color: 'text-indigo-500', border: 'border-indigo-500/30', bg: 'bg-indigo-500/10', label: 'Op-Amp', desc: 'LM358' },
-              { type: 'photoresistor', category: 'Passive', icon: Sun, color: 'text-red-400', border: 'border-red-400/30', bg: 'bg-red-400/10', label: 'Photoresistor', desc: 'LDR' },
-              { type: 'thermistor', category: 'Passive', icon: Activity, color: 'text-emerald-500', border: 'border-emerald-500/30', bg: 'bg-emerald-500/10', label: 'Thermistor', desc: 'Temp Sensor' },
-              { type: 'power_supply', category: 'Sources', icon: Battery, color: 'text-cyan-500', border: 'border-cyan-500/30', bg: 'bg-cyan-500/10', label: 'Power Supply', desc: 'Variable DC' },
-
-              ].filter(comp => {
+              {COMPONENT_LIBRARY.filter(comp => {
                 const matchesSearch = comp.label.toLowerCase().includes(searchQuery.toLowerCase());
                 const matchesCategory = activeCategory === 'All' || comp.category === activeCategory;
                 return matchesSearch && matchesCategory;

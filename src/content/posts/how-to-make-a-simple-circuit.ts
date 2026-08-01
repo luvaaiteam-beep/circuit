@@ -85,7 +85,7 @@ export const post: BlogPost = {
         }
       ],
       screenshot: {
-        src: '/blog/simple-circuit-running.png',
+        src: '/blog/simple-circuit-running.webp',
         alt: 'Simple LED circuit running in CircuitForge with current flow visible',
         caption: 'The completed circuit running in CircuitForge. The animated dots show current flowing from the battery through the resistor and into the LED.'
       },
@@ -148,7 +148,7 @@ export const post: BlogPost = {
         }
       ],
       screenshot: {
-        src: '/blog/resistor-value-panel.png',
+        src: '/blog/resistor-value-panel.webp',
         alt: 'CircuitForge component properties panel showing resistance value input',
         caption: 'Clicking any component opens its properties panel. Drop the resistance from 1000Ω to 220Ω and watch the LED get brighter instantly.'
       }
