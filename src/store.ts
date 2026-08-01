@@ -52,7 +52,7 @@ interface CircuitState {
   circuitName: string;
   zoomToFitRequested: boolean;
 
-  addLog: (msg: string, type?: 'info' | 'cmd' | 'error' | 'success') => void;
+  addLog: (msg: string, type?: 'info' | 'cmd' | 'error' | 'success', fromToast?: boolean) => void;
   loadCircuit: (data: string) => void;
 
   setCircuitName: (name: string) => void;
@@ -152,9 +152,14 @@ export const useCircuitStore = create<CircuitState>((set, get) => ({
   zoomToFit: () => set({ zoomToFitRequested: true }),
   setZoomToFitRequested: (requested) => set({ zoomToFitRequested: requested }),
 
-  addLog: (msg, type = 'info') => set((state) => ({
-    logs: [...state.logs, { id: uuidv4(), time: new Date().toLocaleTimeString(), msg, type }].slice(-100)
-  })),
+  addLog: (msg, type = 'info', fromToast = false) => {
+    set((state) => ({
+      logs: [...state.logs, { id: uuidv4(), time: new Date().toLocaleTimeString(), msg, type }].slice(-100)
+    }));
+    if (!fromToast && (type === 'error' || type === 'success') && window.innerWidth < 768) {
+      get().showToast(msg, type);
+    }
+  },
 
   loadCircuit: (data) => {
     try {
@@ -469,7 +474,7 @@ export const useCircuitStore = create<CircuitState>((set, get) => ({
   toggleSnap: () => set((state) => ({ snapToGrid: !state.snapToGrid })),
   
   showToast: (msg, type = 'info') => {
-    get().addLog(msg, type);
+    get().addLog(msg, type, true);
     set({ toastMessage: msg, toastType: type });
     setTimeout(() => {
       set((state) => state.toastMessage === msg ? { toastMessage: null } : state);

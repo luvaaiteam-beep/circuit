@@ -307,7 +307,7 @@ export const BlogTemplate = ({ post }: { post: BlogPost }) => {
                 src={post.heroImage.src} 
                 alt={post.heroImage.alt}
                 loading="eager"
-                fetchpriority="high"
+                fetchPriority="high"
                 className="w-full rounded-2xl object-cover border border-zinc-800"
                 style={{ height: '320px' }}
                 onError={(e) => {

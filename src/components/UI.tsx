@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useCircuitStore, ComponentType, ToolType } from '../store';
-import { Battery, Zap, Lightbulb, ToggleLeft, Settings, Trash2, MousePointer2, GitCommitHorizontal, RotateCw, Play, Square, Activity, Terminal, Cpu, Layers, Download, Upload, ArrowRightToLine, Magnet, Fan, Volume2, SlidersHorizontal, ShieldAlert, Sun, Moon, ToggleRight, Share2, Grid, Camera, LogOut, LogIn, Menu, MoreHorizontal, X, Keyboard, Maximize } from 'lucide-react';
+import { Battery, Zap, Lightbulb, ToggleLeft, Settings, Trash2, MousePointer2, GitCommitHorizontal, RotateCw, Play, Square, Activity, Terminal, Cpu, Layers, Download, Upload, ArrowRightToLine, Magnet, Fan, Volume2, SlidersHorizontal, ShieldAlert, Sun, Moon, ToggleRight, Share2, Grid, Camera, LogOut, LogIn, Menu, MoreHorizontal, X, Keyboard, Maximize, ChevronDown, HelpCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { Link } from 'react-router-dom';
 import { saveCircuit, shareCircuit } from '../services/circuitService';
@@ -39,6 +39,101 @@ const COMPONENT_LIBRARY = [
   { type: 'thermistor', category: 'Passive', icon: Activity, color: 'text-emerald-500', border: 'border-emerald-500/30', bg: 'bg-emerald-500/10', label: 'Thermistor', desc: 'Temp Sensor', shortDesc: 'Temp Sensor' },
   { type: 'power_supply', category: 'Sources', icon: Battery, color: 'text-cyan-500', border: 'border-cyan-500/30', bg: 'bg-cyan-500/10', label: 'Power Supply', desc: 'Variable DC', shortDesc: 'Variable DC' },
 ];
+
+const TopBarMenu = ({ label, children }: { label: string, children: React.ReactNode }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen]);
+
+  return (
+    <div className="relative hidden md:block" ref={menuRef}>
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className={`px-3 py-1.5 rounded text-xs font-bold tracking-wider transition-all flex items-center gap-1 border ${isOpen ? 'bg-zinc-800 text-cyan-400 border-zinc-700' : 'text-zinc-400 border-transparent hover:bg-zinc-900 hover:text-zinc-200'}`}
+      >
+        {label} <ChevronDown size={14} />
+      </button>
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-2 min-w-[160px] bg-zinc-950 border border-zinc-800 rounded-lg shadow-xl p-1.5 z-50 flex flex-col gap-0.5" onClick={() => setIsOpen(false)}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const MenuItem = ({ onClick, icon: Icon, children, disabled = false, className = '' }: any) => (
+  <button 
+    onClick={onClick} 
+    disabled={disabled}
+    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-bold tracking-wider transition-all text-left ${disabled ? 'text-zinc-600 cursor-not-allowed' : 'text-zinc-400 hover:text-cyan-400 hover:bg-zinc-900'} ${className}`}
+  >
+    {Icon && <Icon size={14} />}
+    <span className="flex-1">{children}</span>
+  </button>
+);
+
+const AiChatPanel = ({ aiHistory, handleAiSubmit, aiLoading, aiInput, setAiInput }: any) => (
+  <div className="flex flex-col h-full">
+    <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-2 mb-2 pr-2">
+      {aiHistory.length === 0 && (
+        <div className="flex flex-col gap-2">
+          <div className="text-zinc-500 italic">Ask me anything about your circuit!</div>
+          <div className="flex gap-2 mt-2 flex-wrap">
+            {['Explain this circuit', 'Find errors', 'Suggest improvements'].map((prompt: string) => (
+              <button
+                key={prompt}
+                onClick={() => handleAiSubmit(undefined, prompt)}
+                className="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-[10px] transition-colors"
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {aiHistory.map((msg: any, i: number) => (
+        <div key={i} className={`flex gap-2 ${msg.role === 'user' ? 'text-zinc-300' : 'text-cyan-400'}`}>
+          <span className="shrink-0 font-bold">{msg.role === 'user' ? 'You:' : 'AI:'}</span>
+          <span className="whitespace-pre-wrap">{msg.content}</span>
+        </div>
+      ))}
+      {aiLoading && <div className="text-zinc-500 animate-pulse">Thinking...</div>}
+    </div>
+    <div className="flex items-center gap-2 border-t border-zinc-800 pt-2 shrink-0">
+      <input 
+        type="text" 
+        value={aiInput}
+        onChange={e => setAiInput(e.target.value)}
+        onKeyDown={handleAiSubmit}
+        className="flex-1 bg-zinc-950 border border-zinc-800 rounded px-2 py-1 outline-none text-zinc-200 placeholder-zinc-600 focus:border-cyan-400/50"
+        placeholder="Ask CircuitForge AI..."
+        spellCheck={false}
+      />
+      <button onClick={handleAiSubmit} disabled={aiLoading || !aiInput.trim()} className="px-3 py-1 bg-cyan-400/10 text-cyan-400 border border-cyan-400/30 rounded hover:bg-cyan-400/20 disabled:opacity-50">
+        Send
+      </button>
+    </div>
+  </div>
+);
 
 const Minimap = () => {
   const { components, wires, selectedCompId } = useCircuitStore();
@@ -96,8 +191,44 @@ export const UI = () => {
   const [showInspectorSheet, setShowInspectorSheet] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showAiSheet, setShowAiSheet] = useState(false);
 
   const [activeBottomTab, setActiveBottomTab] = useState<'console' | 'stats' | 'ai'>('console');
+  const [bottomPanelHeights, setBottomPanelHeights] = useState<Record<string, number>>(() => {
+    try {
+      const stored = localStorage.getItem('circuit-forge-bottom-height');
+      if (stored) return JSON.parse(stored);
+    } catch (e) {}
+    return { console: 128, stats: 128, ai: 320 };
+  });
+  const [isDraggingPanel, setIsDraggingPanel] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('circuit-forge-bottom-height', JSON.stringify(bottomPanelHeights));
+  }, [bottomPanelHeights]);
+
+  const handleBottomPanelResizeStart = (e: React.PointerEvent) => {
+    e.preventDefault();
+    setIsDraggingPanel(true);
+    
+    const startY = e.clientY;
+    const startHeight = bottomPanelHeights[activeBottomTab] || 128;
+    
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      const deltaY = startY - moveEvent.clientY;
+      const newHeight = Math.max(100, Math.min(window.innerHeight * 0.6, startHeight + deltaY));
+      setBottomPanelHeights(prev => ({ ...prev, [activeBottomTab]: newHeight }));
+    };
+    
+    const handlePointerUp = () => {
+      setIsDraggingPanel(false);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+    };
+    
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+  };
   const [mobileInspectorTab, setMobileInspectorTab] = useState<'inspector' | 'ai' | 'console'>('inspector');
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [bottomOpen, setBottomOpen] = useState(true);
@@ -352,9 +483,9 @@ export const UI = () => {
   return (
     <>
       {/* Top Bar */}
-      <div className="fixed top-0 left-0 right-0 h-14 bg-zinc-950/90 border-b border-zinc-800 flex items-center px-4 md:px-6 gap-2 md:gap-4 z-50 backdrop-blur-xl overflow-x-auto no-scrollbar">
+      <div className="fixed top-0 left-0 right-0 h-14 bg-zinc-950/90 border-b border-zinc-800 flex items-center px-4 md:px-6 gap-2 md:gap-4 z-50 backdrop-blur-xl">
         <Link to="/" className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity">
-          <Cpu className="text-cyan-400" size={20} />
+          <Zap className="text-amber-400" size={20} />
           <div className="font-mono text-base md:text-lg text-zinc-100 tracking-tight font-bold whitespace-nowrap hidden sm:block">
             Circuit<span className="text-cyan-400">Forge</span>
           </div>
@@ -366,11 +497,50 @@ export const UI = () => {
         
         <div className="w-px h-6 bg-zinc-800 shrink-0 hidden md:block" />
         
-        <div className="font-mono text-[10px] px-2.5 py-1 rounded border border-zinc-700 text-zinc-400 flex items-center gap-1.5 bg-zinc-900/50 shrink-0">
+        <TopBarMenu label="File">
+          <MenuItem onClick={handleSave} icon={Download}>Save Circuit</MenuItem>
+          <label className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-bold tracking-wider transition-all text-left text-zinc-400 hover:text-cyan-400 hover:bg-zinc-900 cursor-pointer">
+            <Upload size={14} />
+            <span className="flex-1">Load Circuit</span>
+            <input type="file" accept=".json" className="hidden" onChange={handleLoad} />
+          </label>
+          <MenuItem onClick={handleShare} disabled={isSharing} icon={Share2}>
+            {isSharing ? 'Sharing...' : 'Share Circuit'}
+          </MenuItem>
+          <div className="h-px bg-zinc-800 my-1 mx-1" />
+          <MenuItem onClick={exportPNG} icon={Camera}>Export PNG</MenuItem>
+          <MenuItem onClick={exportSVG} icon={Download}>Export SVG</MenuItem>
+        </TopBarMenu>
+
+        <TopBarMenu label="Edit">
+          <MenuItem onClick={autoWire} icon={GitCommitHorizontal}>Auto-Wire</MenuItem>
+          <MenuItem onClick={toggleSnap} icon={Grid} className={snapToGrid ? 'text-cyan-400 bg-cyan-400/5' : ''}>
+            Snap to Grid
+          </MenuItem>
+          <div className="h-px bg-zinc-800 my-1 mx-1" />
+          <MenuItem onClick={() => setShowClearConfirm(true)} icon={Trash2} className="hover:text-red-400 hover:bg-red-500/10">Clear Circuit</MenuItem>
+        </TopBarMenu>
+
+        <TopBarMenu label="View">
+          <MenuItem onClick={zoomToFit} icon={Maximize}>Zoom to Fit</MenuItem>
+          <MenuItem onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} icon={theme === 'dark' ? Sun : Moon}>
+            {theme === 'dark' ? 'Light Theme' : 'Dark Theme'}
+          </MenuItem>
+        </TopBarMenu>
+
+        <TopBarMenu label="Help">
+          <MenuItem onClick={() => setShowTemplates(true)} icon={Lightbulb} className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10">
+            Templates
+          </MenuItem>
+          <MenuItem onClick={() => setShowFaq(true)} icon={HelpCircle}>FAQ</MenuItem>
+          <MenuItem onClick={() => setShowShortcuts(true)} icon={Keyboard}>Keyboard Shortcuts</MenuItem>
+        </TopBarMenu>
+        
+        <div className="font-mono text-[10px] px-2.5 py-1 rounded border border-zinc-700 text-zinc-400 flex items-center gap-1.5 bg-zinc-900/50 shrink-0 hidden lg:flex">
           <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" /> v0.4.0
         </div>
         
-        <div className="w-px h-6 bg-zinc-800 shrink-0 mx-1 md:mx-0" />
+        <div className="hidden md:block w-px h-6 bg-zinc-800 shrink-0 mx-1 md:mx-0" />
 
         <input 
           type="text"
@@ -381,7 +551,15 @@ export const UI = () => {
 
         <div className="hidden md:block w-px h-6 bg-zinc-800 shrink-0 mx-1 md:mx-0" />
         
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="ml-auto flex items-center gap-2 shrink-0">
+          <button 
+            onClick={() => setShowAiSheet(true)}
+            className="flex items-center gap-1.5 px-2 md:px-3 py-1.5 rounded text-xs font-bold tracking-wider bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20 transition-all"
+            title="AI Assistant"
+          >
+            <Cpu size={14} />
+            <span className="hidden md:inline">AI</span>
+          </button>
           <button 
             onClick={toggleSimulation}
             className={`flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded text-xs font-bold tracking-wider border transition-all ${
@@ -393,75 +571,6 @@ export const UI = () => {
             {simRunning ? <><Square size={14} /> STOP</> : <><Play size={14} /> RUN</>}
           </button>
           
-          <button 
-            onClick={() => setShowTemplates(true)} 
-            className="hidden md:flex items-center gap-1.5 px-3 md:px-4 py-1.5 rounded text-xs font-bold tracking-wider border border-yellow-500/50 bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 hover:border-yellow-400 transition-all shadow-[0_0_10px_rgba(234,179,8,0.2)] whitespace-nowrap"
-          >
-            <Lightbulb size={14} /> <span className="hidden sm:inline">TEMPLATES</span>
-          </button>
-          
-          <button onClick={() => setShowFaq(true)} className="hidden md:block px-3 md:px-4 py-1.5 rounded text-xs font-bold tracking-wider border border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-cyan-400 hover:text-cyan-400 transition-all whitespace-nowrap" title="FAQ">
-            FAQ
-          </button>
-          
-          <button onClick={() => setShowShortcuts(true)} className="hidden md:flex p-1.5 rounded border border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-cyan-400 hover:text-cyan-400 transition-all" title="Keyboard Shortcuts">
-            <Keyboard size={16} />
-          </button>
-
-          <button onClick={zoomToFit} className="hidden md:flex p-1.5 rounded border border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-cyan-400 hover:text-cyan-400 transition-all" title="Zoom to Fit">
-            <Maximize size={16} />
-          </button>
-          
-          <button onClick={exportPNG} className="hidden md:flex px-3 md:px-4 py-1.5 rounded text-xs font-bold tracking-wider border border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-cyan-400 hover:text-cyan-400 transition-all items-center gap-1.5 focus:outline-none whitespace-nowrap">
-            <Camera size={14} /> <span className="hidden md:inline">PNG</span>
-          </button>
-          
-          <button onClick={exportSVG} className="hidden md:flex px-3 md:px-4 py-1.5 rounded text-xs font-bold tracking-wider border border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-cyan-400 hover:text-cyan-400 transition-all items-center gap-1.5 focus:outline-none whitespace-nowrap">
-            <Download size={14} /> <span className="hidden md:inline">SVG</span>
-          </button>
-          
-          <button onClick={autoWire} className="hidden md:block px-3 md:px-4 py-1.5 rounded text-xs font-bold tracking-wider border border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-cyan-400 hover:text-cyan-400 transition-all whitespace-nowrap">
-            AUTO-WIRE
-          </button>
-          
-          <button onClick={() => setShowClearConfirm(true)} className="hidden md:block px-3 md:px-4 py-1.5 rounded text-xs font-bold tracking-wider border border-zinc-800 bg-zinc-950 text-zinc-400 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-all whitespace-nowrap">
-            CLEAR
-          </button>
-          
-          <div className="w-px h-4 bg-zinc-800 shrink-0 mx-1 md:mx-2 hidden sm:block" />
-          
-          <button 
-            onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-            className={`p-1.5 rounded border transition-all bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-cyan-400 hover:border-cyan-400/50 hidden md:block`} 
-            title="Toggle Light/Dark Theme"
-          >
-            {theme === 'dark' ? <Moon size={14} /> : <Sun size={14} />}
-          </button>
-          
-          <button 
-            onClick={toggleSnap} 
-            className={`p-1.5 rounded border transition-all ${snapToGrid ? 'bg-cyan-400/10 text-cyan-400 border-cyan-400/50' : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-cyan-400 hover:border-cyan-400/50'} hidden md:block`} 
-            title="Toggle Snap to Grid"
-          >
-            <Grid size={14} />
-          </button>
-          
-          <button onClick={handleSave} className="p-1.5 rounded border border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-cyan-400 hover:border-cyan-400/50 transition-all hidden md:block" title="Save Circuit">
-            <Download size={14} />
-          </button>
-          <label className="p-1.5 rounded border border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-cyan-400 hover:border-cyan-400/50 transition-all cursor-pointer hidden md:block" title="Load Circuit">
-            <Upload size={14} />
-            <input type="file" accept=".json" className="hidden" onChange={handleLoad} />
-          </label>
-          <button 
-            onClick={handleShare} 
-            disabled={isSharing}
-            className={`p-1.5 rounded border border-zinc-800 bg-zinc-950 transition-all flex items-center gap-1 ${isSharing ? 'text-zinc-600' : 'text-zinc-400 hover:text-emerald-400 hover:border-emerald-400/50'} hidden md:flex`} 
-            title="Share Circuit"
-          >
-            <Share2 size={14} />
-            {isSharing && <span className="text-[10px] animate-pulse">...</span>}
-          </button>
           <div className="w-px h-4 bg-zinc-800 shrink-0 mx-1 md:mx-2 hidden md:block" />
           {user ? (
             <button 
@@ -490,7 +599,7 @@ export const UI = () => {
           )}
         </div>
 
-        <div className={`ml-auto font-mono text-[11px] font-medium transition-all flex items-center gap-2 shrink-0 ${simRunning ? 'text-emerald-400' : 'text-zinc-500'}`}>
+        <div className={`hidden md:flex ml-auto font-mono text-[11px] font-medium transition-all flex items-center gap-2 shrink-0 ${simRunning ? 'text-emerald-400' : 'text-zinc-500'}`}>
           <Activity size={14} className={simRunning ? 'animate-pulse' : ''} />
           <span className="hidden md:inline">{simRunning ? 'SIMULATION ACTIVE' : 'SYSTEM IDLE'}</span>
         </div>
@@ -701,7 +810,19 @@ export const UI = () => {
 
       {/* Bottom Console / Stats Panel */}
       {!isMobile && (
-      <div className={`fixed bg-zinc-950 border-t border-zinc-800 flex flex-col z-30 transition-all duration-300 ${bottomOpen ? 'bottom-8 h-32' : '-bottom-32 h-32'} left-0 right-0 md:right-[280px] ${leftOpen ? 'md:left-[240px]' : 'md:left-[60px]'}`}>
+      <div 
+        className={`fixed bg-zinc-950 border-t border-zinc-800 flex flex-col z-30 transition-all duration-300 left-0 right-0 md:right-[280px] ${leftOpen ? 'md:left-[240px]' : 'md:left-[60px]'}`}
+        style={{ 
+          height: bottomPanelHeights[activeBottomTab] || 128,
+          bottom: bottomOpen ? '2rem' : `-${bottomPanelHeights[activeBottomTab] || 128}px`,
+          transitionProperty: isDraggingPanel ? 'none' : 'all'
+        }}
+      >
+        {/* Resize Handle */}
+        <div 
+          className="absolute -top-1 left-0 right-0 h-2 cursor-ns-resize hover:bg-cyan-400/30 z-40 transition-colors" 
+          onPointerDown={handleBottomPanelResizeStart}
+        />
         <div className="absolute -top-8 right-4 flex items-center gap-1">
           <button 
             onClick={() => setBottomOpen(!bottomOpen)}
@@ -796,47 +917,7 @@ export const UI = () => {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col h-full">
-              <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-2 mb-2 pr-2">
-                {aiHistory.length === 0 && (
-                  <div className="flex flex-col gap-2">
-                    <div className="text-zinc-500 italic">Ask me anything about your circuit!</div>
-                    <div className="flex gap-2 mt-2 flex-wrap">
-                      {['Explain this circuit', 'Find errors', 'Suggest improvements'].map(prompt => (
-                        <button
-                          key={prompt}
-                          onClick={() => handleAiSubmit(undefined, prompt)}
-                          className="px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-[10px] transition-colors"
-                        >
-                          {prompt}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {aiHistory.map((msg, i) => (
-                  <div key={i} className={`flex gap-2 ${msg.role === 'user' ? 'text-zinc-300' : 'text-cyan-400'}`}>
-                    <span className="shrink-0 font-bold">{msg.role === 'user' ? 'You:' : 'AI:'}</span>
-                    <span className="whitespace-pre-wrap">{msg.content}</span>
-                  </div>
-                ))}
-                {aiLoading && <div className="text-zinc-500 animate-pulse">Thinking...</div>}
-              </div>
-              <div className="flex items-center gap-2 border-t border-zinc-800 pt-2 shrink-0">
-                <input 
-                  type="text" 
-                  value={aiInput}
-                  onChange={e => setAiInput(e.target.value)}
-                  onKeyDown={handleAiSubmit}
-                  className="flex-1 bg-zinc-950 border border-zinc-800 rounded px-2 py-1 outline-none text-zinc-200 placeholder-zinc-600 focus:border-cyan-400/50"
-                  placeholder="Ask CircuitForge AI..."
-                  spellCheck={false}
-                />
-                <button onClick={handleAiSubmit} disabled={aiLoading || !aiInput.trim()} className="px-3 py-1 bg-cyan-400/10 text-cyan-400 border border-cyan-400/30 rounded hover:bg-cyan-400/20 disabled:opacity-50">
-                  Send
-                </button>
-              </div>
-            </div>
+            <AiChatPanel aiHistory={aiHistory} handleAiSubmit={handleAiSubmit} aiLoading={aiLoading} aiInput={aiInput} setAiInput={setAiInput} />
           )}
         </div>
       </div>
@@ -954,21 +1035,11 @@ export const UI = () => {
             <X size={20} />
           </button>
           
-          <div className="flex px-4 border-b border-zinc-800 shrink-0">
-            {['Inspector', 'AI', 'Console'].map(tab => (
-              <button 
-                key={tab}
-                onClick={() => setMobileInspectorTab(tab.toLowerCase() as any)}
-                className={`py-2 px-3 text-xs font-mono font-medium border-b-2 transition-colors ${mobileInspectorTab === tab.toLowerCase() ? 'text-cyan-400 border-cyan-400' : 'text-zinc-500 border-transparent'}`}
-              >
-                {tab}
-              </button>
-            ))}
+          <div className="flex px-4 py-3 border-b border-zinc-800 shrink-0">
+            <h3 className="text-zinc-100 font-bold text-sm">Inspector</h3>
           </div>
-
           <div className="p-4 flex-1 overflow-y-auto custom-scrollbar">
-            {mobileInspectorTab === 'inspector' ? (
-              <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4">
                 {/* Live Meters */}
                 <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 flex flex-col gap-3">
                   <div>
@@ -994,67 +1065,79 @@ export const UI = () => {
 
                 {/* Component Properties */}
                 {selectedComp ? (
-                  <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-3 pb-2 border-b border-zinc-800">
-                      <span className="text-zinc-100 font-medium text-sm capitalize">{selectedComp.type}</span>
-                      <span className="text-zinc-600 font-mono text-[9px]">{selectedComp.id.slice(0, 8)}</span>
+                  <>
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-3 pb-2 border-b border-zinc-800">
+                        <span className="text-zinc-100 font-medium text-sm capitalize">{selectedComp.type}</span>
+                        <span className="text-zinc-600 font-mono text-[9px]">{selectedComp.id.slice(0, 8)}</span>
+                      </div>
+                      <div className="flex flex-col gap-2 mb-4">
+                        {Object.entries(selectedComp.properties).map(([k, v]) => (
+                          <div key={k} className="flex justify-between items-center bg-zinc-950 p-2 rounded">
+                            <span className="text-zinc-400 font-mono text-[11px] capitalize">{k}</span>
+                            {typeof v === 'boolean' ? (
+                              <button 
+                                onClick={() => updateComponent(selectedComp.id, { properties: { ...selectedComp.properties, [k]: !v } })} 
+                                className={`px-3 py-1 rounded-sm text-xs font-mono border ${v ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-zinc-900 text-zinc-500 border-zinc-800'}`}
+                              >
+                                {v ? 'ON' : 'OFF'}
+                              </button>
+                            ) : (
+                              <input 
+                                type="number" 
+                                value={v as number}
+                                onChange={(e) => updateComponent(selectedComp.id, { properties: { ...selectedComp.properties, [k]: parseFloat(e.target.value) || 0 } })}
+                                className="w-20 bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-cyan-400 text-right text-xs font-mono outline-none focus:border-cyan-400"
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      <button onClick={handleRotate} className="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded text-xs font-medium flex items-center justify-center gap-2">
+                        <RotateCw size={14} /> Rotate 90°
+                      </button>
                     </div>
-                    <div className="flex flex-col gap-2 mb-4">
-                      {Object.entries(selectedComp.properties).map(([k, v]) => (
-                        <div key={k} className="flex justify-between items-center bg-zinc-950 p-2 rounded">
-                          <span className="text-zinc-400 font-mono text-[11px] capitalize">{k}</span>
-                          {typeof v === 'boolean' ? (
-                            <button 
-                              onClick={() => updateComponent(selectedComp.id, { properties: { ...selectedComp.properties, [k]: !v } })} 
-                              className={`px-3 py-1 rounded-sm text-xs font-mono border ${v ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-zinc-900 text-zinc-500 border-zinc-800'}`}
-                            >
-                              {v ? 'ON' : 'OFF'}
-                            </button>
-                          ) : (
-                            <input 
-                              type="number" 
-                              value={v as number}
-                              onChange={(e) => updateComponent(selectedComp.id, { properties: { ...selectedComp.properties, [k]: parseFloat(e.target.value) || 0 } })}
-                              className="w-20 bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-cyan-400 text-right text-xs font-mono outline-none focus:border-cyan-400"
-                            />
-                          )}
-                        </div>
-                      ))}
+                    
+                    {/* Oscilloscope for selected component */}
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 flex flex-col gap-2 h-32">
+                      <div className="text-zinc-600 flex justify-between uppercase text-[10px] font-mono">
+                        <span>OSCILLOSCOPE</span>
+                      </div>
+                      <div className="flex-1 w-full bg-zinc-950 rounded border border-zinc-800 relative overflow-hidden">
+                        <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 50 100">
+                          <polyline
+                            points={vHistory.map((v, i) => {
+                              const maxV = 24;
+                              const baseline = 50;
+                              const y = baseline - (v / maxV) * 50;
+                              return `${i},${Math.max(0, Math.min(100, y))}`;
+                            }).join(' ')}
+                            fill="none"
+                            stroke="#22d3ee"
+                            strokeWidth="1"
+                            vectorEffect="non-scaling-stroke"
+                          />
+                        </svg>
+                      </div>
                     </div>
-                    <button onClick={handleRotate} className="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 rounded text-xs font-medium flex items-center justify-center gap-2">
-                      <RotateCw size={14} /> Rotate 90°
-                    </button>
-                  </div>
+                  </>
                 ) : (
                   <div className="text-center p-4 text-zinc-500 text-xs">No component selected.</div>
                 )}
               </div>
-            ) : mobileInspectorTab === 'ai' ? (
-              <div className="flex flex-col h-full"> ... (Replaced visually later, let's just show text here for now or just standard) 
-                <div className="flex-1 overflow-y-auto mb-2 text-xs font-mono">
-                  {aiHistory.length === 0 && <span className="text-zinc-500">Ask about your circuit</span>}
-                  {aiHistory.map((m, i) => (
-                    <div key={i} className={`mb-2 ${m.role === 'user' ? 'text-zinc-300' : 'text-cyan-400'}`}>{m.role === 'user' ? 'You:' : 'AI:'} {m.content}</div>
-                  ))}
-                </div>
-                <div className="flex items-center gap-2 border-t border-zinc-800 pt-2 shrink-0">
-                  <input type="text" value={aiInput} onChange={(e) => setAiInput(e.target.value)} className="flex-1 bg-zinc-950 text-xs border border-zinc-800 rounded px-2 py-1" />
-                  <button onClick={handleAiSubmit} className="px-2 py-1 text-cyan-400 bg-cyan-400/10 rounded text-xs">Send</button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col h-full font-mono text-[10px]">
-                <div className="flex-1 overflow-y-auto mb-2">
-                  {logs.map(log => (
-                    <div key={log.id} className={`${log.type === 'error' ? 'text-red-400' : 'text-zinc-400'} mb-1 break-all`}>[{log.time}] {log.msg}</div>
-                  ))}
-                </div>
-                <div className="flex items-center gap-2 border-t border-zinc-800 pt-2 shrink-0">
-                  <span className="text-cyan-400">&gt;</span>
-                  <input type="text" value={cmd} onChange={e => setCmd(e.target.value)} onKeyDown={handleCommand} className="flex-1 bg-transparent text-zinc-200 outline-none" />
-                </div>
-              </div>
-            )}
+            </div>
+        </div>
+      )}
+      
+      {/* Mobile AI Sheet */}
+      {isMobile && showAiSheet && (
+        <div className="fixed inset-x-0 bottom-0 z-[200] bg-zinc-950 border-t border-zinc-800 rounded-t-2xl flex flex-col shadow-[0_-5px_30px_rgba(0,0,0,0.5)]" style={{ height: '80vh' }}>
+          <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+            <h3 className="text-zinc-100 font-bold text-sm flex items-center gap-2"><Cpu size={16} className="text-cyan-400"/> AI Assistant</h3>
+            <button onClick={() => setShowAiSheet(false)} className="text-zinc-400"><X size={20} /></button>
+          </div>
+          <div className="flex-1 overflow-hidden p-3 bg-zinc-900">
+            <AiChatPanel aiHistory={aiHistory} handleAiSubmit={handleAiSubmit} aiLoading={aiLoading} aiInput={aiInput} setAiInput={setAiInput} />
           </div>
         </div>
       )}
