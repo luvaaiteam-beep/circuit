@@ -33,6 +33,7 @@ const SYSTEM_PROMPT = "You are CircuitForge AI, an expert electronics engineer a
 // periodically, Google deprecates model IDs faster than their official
 // shutdown dates suggest.
 const GEMINI_MODEL = "gemini-3.6-flash";
+const COMPLEX_MODEL = "gemini-3.1-pro-preview";
 
 const VALID_ROUTES = new Set([
   '/', '/sim', '/simulator', '/gallery', '/features', '/about', '/privacy', '/terms',
@@ -118,9 +119,10 @@ async function startServer() {
       const { userMessage, history, circuitContext } = req.body;
       const client = getGeminiClient();
       const chat = client.chats.create({
-        model: GEMINI_MODEL,
+        model: "gemini-3.1-pro-preview",
         config: {
           systemInstruction: `${SYSTEM_PROMPT}\n\nCurrent Circuit Context:\n${circuitContext}`,
+          thinkingConfig: { thinkingLevel: 'HIGH' }
         },
       });
 

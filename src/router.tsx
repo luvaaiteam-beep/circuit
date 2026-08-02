@@ -39,10 +39,10 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => (
 );
 
 const AuthProvider = React.lazy(() => import('./hooks/AuthProvider').then(m => ({ default: m.AuthProvider })));
-const AuthLayout = () => (
+const AuthLayout = ({ children }: { children?: React.ReactNode }) => (
   <Suspense fallback={<LoadingScreen />}>
     <AuthProvider>
-      <Outlet />
+      {children || <Outlet />}
     </AuthProvider>
   </Suspense>
 );
@@ -52,15 +52,16 @@ export const RouterComponent = () => {
   return (
     <Suspense fallback={<LoadingScreen />}>
       <AnimatePresence mode="wait">
+        <AuthLayout>
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-          <Route element={<AuthLayout />}>
+          
             <Route path="/sim" element={<PageTransition><App /></PageTransition>} />
           <Route path="/simulator" element={<PageTransition><Simulator /></PageTransition>} />
           <Route path="/shared/:id" element={<PageTransition><SharedCircuit /></PageTransition>} />
           <Route path="/embed/:id" element={<PageTransition><Embed /></PageTransition>} />
           <Route path="/gallery" element={<PageTransition><Gallery /></PageTransition>} />
-          </Route>
+          
           <Route path="/features" element={<PageTransition><Features /></PageTransition>} />
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
           <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
@@ -71,6 +72,7 @@ export const RouterComponent = () => {
           <Route path="/learn/electric-circuit-school-project" element={<PageTransition><ElectricCircuitSchoolProject /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>
+      </AuthLayout>
       </AnimatePresence>
     </Suspense>
   );
