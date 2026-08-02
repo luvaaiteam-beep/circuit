@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/AuthContext';
 import { LogOut, User } from 'lucide-react';
 
 export const Navigation = () => {
@@ -9,11 +8,8 @@ export const Navigation = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <motion.nav 
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="sticky top-0 z-50 bg-zinc-950/80 backdrop-blur border-b border-zinc-800 px-6 py-4 flex items-center justify-between"
+    <nav 
+      className="sticky top-0 z-50 bg-zinc-950/80 backdrop-blur border-b border-zinc-800 px-6 py-4 flex items-center justify-between animate-fade-in-up"
     >
       <Link to="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
         <span className="text-white">Circuit</span>
@@ -86,6 +82,6 @@ export const Navigation = () => {
           Open Simulator
         </Link>
       </div>
-    </motion.nav>
+    </nav>
   );
 };

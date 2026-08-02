@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom/server';
-import { AuthProvider } from '../src/hooks/useAuth';
 import { HelmetProvider } from 'react-helmet-async';
 import fs from 'fs';
 import path from 'path';
@@ -27,11 +26,9 @@ routes.forEach(route => {
 
   let html = ReactDOMServer.renderToString(
     <HelmetProvider>
-      <AuthProvider>
-        <StaticRouter location={route.path}>
+      <StaticRouter location={route.path}>
           <Component />
         </StaticRouter>
-      </AuthProvider>
     </HelmetProvider>
   );
 
@@ -47,6 +44,10 @@ routes.forEach(route => {
     <link rel="alternate" hreflang="en" href="${canonicalUrl}" />
   `;
   finalHtml = finalHtml.replace('</head>', `${hreflangTags}\n</head>`);
+  
+  // Remove firebase preload
+  finalHtml = finalHtml.replace(/<link rel="modulepreload"[^>]*href="\/assets\/firebase-[^>]*>/g, '');
+
 
   // React 19 emits <title>, <meta>, <link> inline in SSR when there is no <head> in the tree
   // We can extract them and move them to <head>

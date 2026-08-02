@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { loadPublicGallery, loadUserCircuits, deleteCircuit, GalleryItem, SavedCircuit, reportCircuit } from '../services/circuitService';
 import { Layers, ArrowLeft, Play, Trash2, Flag } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/AuthContext';
 import { motion } from 'motion/react';
 import { Helmet } from 'react-helmet-async';
 import { ParticlesBackground } from '../components/ParticlesBackground';

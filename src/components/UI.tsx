@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useCircuitStore, ComponentType, ToolType } from '../store';
 import { Battery, Zap, Lightbulb, ToggleLeft, Settings, Trash2, MousePointer2, GitCommitHorizontal, RotateCw, Play, Square, Activity, Terminal, Cpu, Layers, Download, Upload, ArrowRightToLine, Magnet, Fan, Volume2, SlidersHorizontal, ShieldAlert, Sun, Moon, ToggleRight, Share2, Grid, Camera, LogOut, LogIn, Menu, MoreHorizontal, X, Keyboard, Maximize, ChevronDown, HelpCircle } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/AuthContext';
 import { Link } from 'react-router-dom';
-import { saveCircuit, shareCircuit } from '../services/circuitService';
+
 
 const COMPONENT_LIBRARY = [
   { type: 'battery', category: 'Sources', icon: Battery, color: 'text-cyan-400', border: 'border-cyan-400/30', bg: 'bg-cyan-400/10', label: 'Battery', desc: '9V DC source', shortDesc: '9V DC source' },
@@ -229,7 +229,6 @@ export const UI = () => {
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerup', handlePointerUp);
   };
-  const [mobileInspectorTab, setMobileInspectorTab] = useState<'inspector' | 'ai' | 'console'>('inspector');
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [bottomOpen, setBottomOpen] = useState(true);
   const [leftOpen, setLeftOpen] = useState(() => window.innerWidth > 768);

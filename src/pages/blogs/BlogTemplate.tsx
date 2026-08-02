@@ -150,9 +150,9 @@ export const BlogTemplate = ({ post }: { post: BlogPost }) => {
             "description": post.metaDescription,
             "image": post.ogImage,
             "author": {
-              "@type": "Organization",
-              "name": "CircuitForge",
-              "url": "https://luvaai.in"
+              "@type": "Person",
+              "name": "Advik",
+              "url": "https://luvaai.in/about"
             },
             "publisher": {
               "@type": "Organization",
@@ -246,11 +246,8 @@ export const BlogTemplate = ({ post }: { post: BlogPost }) => {
         <article className="flex-1 max-w-2xl mx-auto lg:mx-0 w-full">
           
           {/* a) ARTICLE HEADER */}
-          <motion.header 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-12"
+          <header 
+            className="mb-12 animate-fade-in-up"
           >
             <div className="flex items-center gap-4 mb-6">
               <span className="px-3 py-1 bg-cyan-500/10 text-cyan-400 text-xs font-bold uppercase tracking-wider rounded-full border border-cyan-500/20">
@@ -315,20 +312,16 @@ export const BlogTemplate = ({ post }: { post: BlogPost }) => {
                 }}
               />
             )}
-          </motion.header>
+          </header>
 
           <div className="prose prose-invert prose-cyan max-w-none prose-p:text-base prose-p:leading-8 prose-p:mb-6 prose-headings:text-white">
             
             {/* b) SECTIONS LOOP */}
             {post.sections.map((section, index) => (
-              <motion.section 
+              <section 
                 key={section.id}
                 id={section.id}
-                className={`mb-20 scroll-mt-24 ${index === 0 ? '' : 'border-t border-zinc-800/50 pt-12'}`}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
+                className={`mb-20 scroll-mt-24 ${index === 0 ? '' : 'border-t border-zinc-800/50 pt-12'} animate-fade-in-up`}
               >
                 {/* i) H2 heading */}
                 {section.heading && (
@@ -361,19 +354,16 @@ export const BlogTemplate = ({ post }: { post: BlogPost }) => {
                     {section.cards.map((card, i) => {
                       const Icon = IconMap[card.icon] || Zap;
                       return (
-                        <motion.div 
+                        <div 
                           key={i}
-                          initial={{ opacity: 0, x: -20 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: i * 0.1 }}
-                          className="bg-zinc-900/50 p-6 rounded-xl border border-zinc-800"
+                          className="bg-zinc-900/50 p-6 rounded-xl border border-zinc-800 animate-fade-in-up"
+                          style={{ animationDelay: `${i * 0.1}s` }}
                         >
                           <strong className="text-white text-lg block mb-2 flex items-center gap-2">
                             <Icon className={`w-5 h-5 text-${card.iconColor}-400`} /> {card.title}
                           </strong>
                           <p className="text-zinc-400 m-0">{card.body}</p>
-                        </motion.div>
+                        </div>
                       );
                     })}
                   </div>
@@ -384,13 +374,11 @@ export const BlogTemplate = ({ post }: { post: BlogPost }) => {
                   <div className="space-y-10 my-10">
                     {section.steps.map((step, i) => (
                       <div key={i} className="flex gap-6">
-                        <motion.div 
-                          whileInView={{ scale: [0.8, 1] }} 
-                          viewport={{ once: true }}
-                          className="w-10 h-10 rounded-full bg-cyan-950 text-cyan-400 font-bold flex items-center justify-center shrink-0 border border-cyan-900 text-lg shadow-[0_0_15px_rgba(34,211,238,0.2)]"
+                        <div 
+                          className="w-10 h-10 rounded-full bg-cyan-950 text-cyan-400 font-bold flex items-center justify-center shrink-0 border border-cyan-900 text-lg shadow-[0_0_15px_rgba(34,211,238,0.2)] animate-fade-in-up"
                         >
                           {i + 1}
-                        </motion.div>
+                        </div>
                         <div>
                           <strong className="text-white text-xl block mb-2">{step.title}</strong>
                           <p className="text-zinc-400 mb-2">{step.body}</p>
@@ -493,7 +481,7 @@ export const BlogTemplate = ({ post }: { post: BlogPost }) => {
                     </Link>
                   </div>
                 )}
-              </motion.section>
+              </section>
             ))}
 
             {/* c) FAQ SECTION */}

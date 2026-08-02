@@ -74,7 +74,7 @@ async function startServer() {
 
   const corsOptions = {
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-      const allowedOrigins = ['https://luvaai.in', 'http://localhost:3000', 'http://localhost:5173'];
+      const allowedOrigins = ['https://luvaai.in', 'https://www.luvaai.in', 'http://localhost:3000', 'http://localhost:5173'];
       if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.run.app')) {
         callback(null, true);
       } else {
@@ -163,7 +163,7 @@ async function startServer() {
       const isApi = req.path.startsWith('/api/');
       
       if (!isInternal && !hasExt && !isSpa && !isApi) {
-        return res.status(410).send('Gone');
+        res.status(404);
       }
       next();
     });
@@ -191,7 +191,7 @@ async function startServer() {
 
       const isSpa = VALID_ROUTES.has(req.path) || VALID_PREFIXES.some(p => req.path.startsWith(p));
       if (!isSpa) {
-        return res.status(410).send('Gone');
+        return res.status(404).sendFile(path.join(distPath, 'index.html'));
       }
       res.sendFile(path.join(distPath, 'index.html'));
     });

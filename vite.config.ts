@@ -17,6 +17,11 @@ export default defineConfig(({mode}) => {
       hmr: process.env.DISABLE_HMR !== 'true',
     },
     build: {
+      modulePreload: {
+        resolveDependencies(filename, deps, context) {
+          return deps.filter(dep => !dep.includes('firebase'));
+        }
+      },
       rollupOptions: {
         output: {
           manualChunks: {

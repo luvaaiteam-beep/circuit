@@ -14,7 +14,7 @@ export const About = () => {
       </div>
       <Navigation />
       <Helmet>
-        <title>About CircuitForge — Free 3D Browser Circuit Simulator | luvaai.in</title>
+        <title>About CircuitForge — Free 3D Browser Circuit Simulator</title>
         <meta name="description" content="CircuitForge is a free browser-based 3D circuit simulator built for students, educators, and electronics hobbyists. No download, no signup required." />
         <meta name="keywords" content="about CircuitForge, free circuit simulator, browser circuit simulator, electronics learning tool, who made CircuitForge" />
         <link rel="canonical" href="https://luvaai.in/about" />
@@ -63,10 +63,10 @@ export const About = () => {
 
             <h2 className="text-2xl font-bold text-white mt-12 mb-4">Who's Behind This</h2>
             <p>
-              CircuitForge is built and maintained by one person — me, Advik. I'm a
-              student, not a professional electronics engineer, and I don't have a
-              degree or formal industry background in this field. I built this because
-              I wanted a hands-on way to learn circuits myself, and it grew from there.
+              CircuitForge is built and maintained by Advik. I am a solo student developer building CircuitForge, a free 3D browser-based circuit simulator. I built this because I wanted a hands-on way to learn circuits myself, and it grew from there.
+
+
+
             </p>
             <p>
               Because I'm learning too, I take accuracy seriously: every simulator

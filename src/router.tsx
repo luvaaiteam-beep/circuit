@@ -1,4 +1,7 @@
 import React, { Suspense } from 'react';
+
+import { useAuth } from './hooks/AuthContext';
+import { Outlet } from 'react-router-dom';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Home } from './pages/Home';
@@ -35,6 +38,15 @@ const PageTransition = ({ children }: { children: React.ReactNode }) => (
   </motion.div>
 );
 
+const AuthProvider = React.lazy(() => import('./hooks/AuthProvider').then(m => ({ default: m.AuthProvider })));
+const AuthLayout = () => (
+  <Suspense fallback={<LoadingScreen />}>
+    <AuthProvider>
+      <Outlet />
+    </AuthProvider>
+  </Suspense>
+);
+
 export const RouterComponent = () => {
   const location = useLocation();
   return (
@@ -42,11 +54,13 @@ export const RouterComponent = () => {
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-          <Route path="/sim" element={<PageTransition><App /></PageTransition>} />
+          <Route element={<AuthLayout />}>
+            <Route path="/sim" element={<PageTransition><App /></PageTransition>} />
           <Route path="/simulator" element={<PageTransition><Simulator /></PageTransition>} />
           <Route path="/shared/:id" element={<PageTransition><SharedCircuit /></PageTransition>} />
           <Route path="/embed/:id" element={<PageTransition><Embed /></PageTransition>} />
           <Route path="/gallery" element={<PageTransition><Gallery /></PageTransition>} />
+          </Route>
           <Route path="/features" element={<PageTransition><Features /></PageTransition>} />
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
           <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
